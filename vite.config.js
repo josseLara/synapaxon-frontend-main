@@ -9,6 +9,6 @@ export default defineConfig({
     port: 5173,      // Optional: default is 5173
   },
   preview: {
-    allowedHosts: ['synapaxon-frontend.onrender.com']
+    allowedHosts: ['synapaxon-frontend-main.vercel.app']
   }
 })
