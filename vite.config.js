@@ -7,8 +7,5 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // Allows access from LAN
     port: 5173,      // Optional: default is 5173
-  },
-  preview: {
-    allowedHosts: ['synapaxon-frontend-main.vercel.app']
   }
 })
