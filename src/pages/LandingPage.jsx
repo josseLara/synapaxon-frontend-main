@@ -1,493 +1,708 @@
-import { useState, useEffect } from 'react';
+"use client"
+
+import { useState, useEffect } from "react"
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
+import {
+  CheckIcon,
+  MenuIcon,
+  XIcon,
+  SunIcon,
+  MoonIcon,
+  BookOpenIcon,
+  UsersIcon,
+  TrendingUpIcon,
+  ArrowRightIcon,
+  PlayIcon,
+  StarIcon,
+} from "lucide-react"
+import { QuizCardIllustration } from "../components/quiz-card-illustration"
+import { LearningProcessIllustration } from "../components/learning-process-illustration"
 
 function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const { scrollYProgress } = useScroll()
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"])
 
-  // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem("theme")
     if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
+      setIsDarkMode(savedTheme === "dark")
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark")
       } else {
-        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.remove("dark")
       }
     }
-  }, []);
+  }, [])
 
-  // Toggle dark/light mode
   const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
+    const newMode = !isDarkMode
+    setIsDarkMode(newMode)
     if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      document.documentElement.classList.add("dark")
+      localStorage.setItem("theme", "dark")
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      document.documentElement.classList.remove("dark")
+      localStorage.setItem("theme", "light")
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Navbar */}
-      <nav className="bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-md">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Navigation */}
+      <motion.nav
+        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
+          <div className="flex justify-between items-center h-16">
+            <motion.div className="flex items-center" whileHover={{ scale: 1.05 }}>
               <div className="flex-shrink-0 flex items-center">
-                <span className="text-xl font-bold text-indigo-500 dark:text-indigo-300">Synapaxon</span>
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">Synapaxon</span>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <a href="#" className="border-indigo-500 dark:border-indigo-300 text-gray-900 dark:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Home
-                </a>
-                <a href="#features" className="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Features
-                </a>
-                <a href="#pricing" className="border-transparent text-gray-5 System: 00 dark:text-gray-400 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Pricing
-                </a>
-                <a href="#faq" className="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  FAQ
-                </a>
-              </div>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <a href="/login" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-2 text-sm font-medium">
-                Login
+            </motion.div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#" className="text-gray-900 dark:text-white font-medium">
+                Why Synapaxon
               </a>
               <a
-                href="/register"
-                className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium shadow-sm text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                href="#features"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               >
-                Register
+                Features
               </a>
-              <button
-                  onClick={toggleDarkMode}
-                  className={`ml-3 relative inline-block w-12 h-6 rounded-full transition-all duration-300 bg-gradient-to-r bg-[length:200%_100%] ${
-                    isDarkMode
-                      ? 'from-gray-200 to-gray-800 bg-right'
-                      : 'from-gray-200 to-gray-800 bg-left'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 w-5 h-5 rounded-full transition-all duration-300 bg-gradient-to-r bg-[length:200%_100%] ${
-                      isDarkMode
-                        ? 'left-[calc(100%-1.25rem-0.125rem)] from-gray-200 to-gray-800 bg-left'
-                        : 'left-0.5 from-gray-200 to-gray-800 bg-right'
-                    }`}
-                  ></span>
-                </button>
-
-
-
+              <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                Pricing
+              </a>
+              <a href="#faq" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                Resources
+              </a>
             </div>
-            <div className="-mr-2 flex items-center sm:hidden">
+
+            <div className="hidden md:flex items-center space-x-4">
+              <a
+                href="/login"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium"
+              >
+                Sign in
+              </a>
+              <motion.a
+                href="/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span>Request Demo</span>
+                <ArrowRightIcon className="w-4 h-4" />
+              </motion.a>
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
               >
-                <span className="sr-only">Open main menu</span>
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                {mobileMenuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="sm:hidden bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
-            <div className="pt-2 pb-3 space-y-1">
-              <a href="#" className="bg-indigo-50 dark:bg-indigo-900/50 border-indigo-500 dark:border-indigo-300 text-indigo-500 dark:text-indigo-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                Home
-              </a>
-              <a href="#features" className="border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                Features
-              </a>
-              <a href="#pricing" className="border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                Pricing
-              </a>
-              <a href="#faq" className="border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-indigo-500 hover:text-gray-700 dark:hover:text-gray-200 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                FAQ
-              </a>
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <a href="/login" className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  Login
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <a
+                  href="#"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Why Synapaxon
                 </a>
                 <a
-                  href="/register"
-                  className="block w-full px-4 py-2 mt-2 text-base font-medium text-center text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
+                  href="#features"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  Register
+                  Features
                 </a>
-                <button
-                  onClick={toggleDarkMode}
-                  className="block w-full px-4 py-2 mt-2 text-base font-medium text-center text-gray-900 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-colors duration-200"
+                <a
+                  href="#pricing"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  {isDarkMode ? (
-                    <>
-                      <i className="fas fa-sun mr-2"></i> Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-moon mr-2"></i> Dark Mode
-                    </>
-                  )}
-                </button>
+                  Pricing
+                </a>
+                <a
+                  href="#faq"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Resources
+                </a>
+                <div className="pt-4 pb-2 border-t border-gray-200 dark:border-gray-700">
+                  <a
+                    href="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign in
+                  </a>
+                  <motion.a
+                    href="/register"
+                    className="block w-full mt-2 px-3 py-2 rounded-md text-base font-medium text-center text-white bg-blue-600 hover:bg-blue-700"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Request Demo
+                  </motion.a>
+                </div>
+                <div className="flex justify-center pt-2">
+                  <button
+                    onClick={toggleDarkMode}
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-      </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
 
       {/* Hero Section */}
-      <div className="bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-md">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-5xl lg:text-6xl">
-            Elevate Your Learning Experience
-          </h1>
-          <p className="mt-6 max-w-lg mx-auto text-xl text-gray-500 dark:text-gray-300">
-            The Most Powerfull Way To Learn Is To Create Your Own Content.
-          </p>
-          <div className="mt-10 flex justify-center space-x-4">
-            <a
-              href="/register"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium shadow-sm text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
-            >
-              Get Started
-            </a>
-            <a
-              href="#features"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium text-indigo-500 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-800"
-            >
-              Learn more
-            </a>
+      <section className="relative overflow-hidden bg-white dark:bg-gray-800 pt-16 pb-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+            <div className="lg:col-span-6">
+              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+                  The World's Most <span className="text-blue-600">Modern Medical Learning</span> Platform
+                </h1>
+                <p className="mt-6 text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Synapaxon is the all-in-one platform for creating medical quizzes and personalized learning
+                  experiences to accelerate your medical education journey.
+                </p>
+                <motion.div
+                  className="mt-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <motion.a
+                    href="/register"
+                    className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold space-x-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span>Request Demo</span>
+                    <ArrowRightIcon className="w-5 h-5" />
+                  </motion.a>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            <div className="lg:col-span-6 mt-12 lg:mt-0">
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                style={{ y }}
+              >
+                <QuizCardIllustration />
+              </motion.div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Value Proposition Section */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <LearningProcessIllustration />
+              </motion.div>
+            </div>
+
+            <div className="lg:col-span-6 order-1 lg:order-2">
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+                  Medical education built for <span className="text-blue-600">tomorrow</span>, not yesterday
+                </h2>
+                <motion.div
+                  className="mt-8"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.a
+                    href="#features"
+                    className="inline-flex items-center bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold space-x-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span>Learn Why Synapaxon</span>
+                    <ArrowRightIcon className="w-5 h-5" />
+                  </motion.a>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
-      <div id="features" className="py-12 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-md">
+      <section id="features" className="py-24 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-indigo-500 dark:text-indigo-300 font-semibold tracking-wide uppercase">Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
-              Everything you need to learn effectively
-            </p>
-          </div>
-
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-              {/* Feature 1 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 bg-indigo-500 dark:bg-indigo-600 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
+          <motion.div
+            className="grid md:grid-cols-3 gap-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, staggerChildren: 0.2 }}
+            viewport={{ once: true }}
+          >
+            {[
+              {
+                icon: <BookOpenIcon className="w-8 h-8" />,
+                title: "Streamlined Creation",
+                description:
+                  "Build medical quizzes in minutes with our intuitive editor. Ready-to-go medical templates covering Ciencias Básicas, Sistemas de órganos, and Especialidades Clínicas.",
+              },
+              {
+                icon: <TrendingUpIcon className="w-8 h-8" />,
+                title: "Accelerate your Learning",
+                description:
+                  "Leverage analytics for smarter medical study habits. Track your progress across different medical specialties and difficulty levels.",
+              },
+              {
+                icon: <UsersIcon className="w-8 h-8" />,
+                title: "Built for Growth",
+                description:
+                  "From medical students to residents and practicing physicians. Our platform scales with your medical learning needs.",
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                className="text-center"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+              >
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center text-blue-600">
+                    {feature.icon}
+                  </div>
                 </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Custom Quizzes</p>
-                <p className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                  Create personalized quizzes with our intuitive builder. Add images, videos, and multiple question types.
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Platform Features */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+            <div className="lg:col-span-6">
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
+                  Complete platform for <span className="text-blue-600">personalized medical education</span>
+                </h2>
+                <p className="mt-6 text-lg text-gray-600 dark:text-gray-300">
+                  Synapaxon provides the tools for you to create unique medical learning experiences covering all areas
+                  from basic sciences to clinical specialties. Enhance your knowledge retention while growing smarter
+                  and faster.
                 </p>
-              </div>
 
-              {/* Feature 2 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 bg-indigo-500 dark:bg-indigo-600 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
+                <div className="mt-8 space-y-4">
+                  {[
+                    "Medical Quiz Builder",
+                    "Performance Analytics",
+                    "Medical Progress Tracking",
+                    "Peer Learning",
+                    "Study Anywhere",
+                    "Clinical Case Studies",
+                  ].map((feature, index) => (
+                    <motion.div
+                      key={feature}
+                      className="flex items-center space-x-3"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                    </motion.div>
+                  ))}
                 </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">User-Generated Content</p>
-                {/* <p className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                  Share your quizzes with the community or keep them private. Discover content from other educators.
-                </p> */}
-              </div>
 
-              {/* Feature 3 */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 bg-indigo-500 dark:bg-indigo-600 text-white">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
+                <motion.div
+                  className="mt-8"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.a
+                    href="#pricing"
+                    className="inline-flex items-center bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold space-x-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span>Learn About Our Platform</span>
+                    <ArrowRightIcon className="w-5 h-5" />
+                  </motion.a>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            <div className="lg:col-span-6 mt-12 lg:mt-0">
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                {/* Platform Preview */}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quiz Dashboard</h3>
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                          <span className="text-blue-600 text-sm font-bold">AB</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">Basic Anatomy</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">25 questions</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4.8</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                          <span className="text-green-600 text-sm font-bold">FC</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">Cardiovascular Physiology</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">30 questions</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4.9</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Subscription Plans</p>
-                <p className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-300">
-                  Choose the plan that fits your needs. 
-                  {/* Free forever option available with premium features for power users. */}
-                </p>
-              </div>
+
+                {/* Floating Elements */}
+                <motion.div
+                  className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  95%
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-4 -left-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg"
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                >
+                  ✓
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Pricing Section */}
-      <div id="pricing" className="py-16 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-md">
+      <section id="pricing" className="py-24 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:flex-col sm:align-center">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-center">Pricing Plans</h2>
-            <p className="mt-5 text-xl text-gray-500 dark:text-gray-300 text-center">
-              Start for free, upgrade when you need more.
-            </p>
-            <div className="relative mt-12 bg-transparent space-y-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto">
-              {/* Free Tier */}
-              <div className="border border-gray-200 dark:border-gray-700 shadow-sm divide-y divide-gray-200 dark:divide-gray-700 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm">
-                <div className="p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Free</h3>
-                  <p className="mt-4 text-sm text-gray-500 dark:text-gray-300">Perfect for getting started</p>
-                  <p className="mt-8">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$0</span>
-                    <span className="text-base font-medium text-gray-500 dark:text-gray-300">/month</span>
-                  </p>
-                  <a
-                    href="/register"
-                    className="mt-8 block w-full py-3 px-6 border border-transparent text-center font-medium text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
-                  >
-                    Get started
-                  </a>
-                </div>
-                <div className="pt-6 pb-8 px-6">
-                  <h4 className="sr-only">Features</h4>
-                  <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Up to 5 quizzes</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Basic question types</p>
-                    </li>
-                    {/* <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Community content access</p>
-                    </li> */}
-                  </ul>
-                </div>
-              </div>
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
+              Simple, transparent pricing
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">Start for free, upgrade when you need more.</p>
+          </motion.div>
 
-              {/* Pro Tier */}
-              <div className="border-2 border-indigo-500 dark:border-indigo-300 shadow-sm divide-y divide-gray-200 dark:divide-gray-700 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm">
-                <div className="p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Pro</h3>
-                  <p className="mt-4 text-sm text-gray-500 dark:text-gray-300">For serious learners and educators</p>
-                  <p className="mt-8">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$9</span>
-                    <span className="text-base font-medium text-gray-500 dark:text-gray-300">/month</span>
-                  </p>
-                  <a
-                    href="/register"
-                    className="mt-8 block w-full py-3 px-6 border border-transparent text-center font-medium text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
-                  >
-                    Upgrade
-                  </a>
-                </div>
-                <div className="pt-6 pb-8 px-6">
-                  <h4 className="sr-only">Features</h4>
-                  <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Unlimited Questions Uploads</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Advanced question types</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Analytics dashboard</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Priority support</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: "Free",
+                price: "$0",
+                description: "Perfect for getting started",
+                features: ["Up to 5 quizzes", "Basic question types", "Community support"],
+                popular: false,
+                cta: "Get started",
+              },
+              {
+                name: "Pro",
+                price: "$9",
+                description: "For serious learners and educators",
+                features: ["Unlimited quizzes", "Advanced analytics", "Priority support", "Custom branding"],
+                popular: true,
+                cta: "Start free trial",
+              },
+              {
+                name: "Premium",
+                price: "$29",
+                description: "For schools and organizations",
+                features: ["Everything in Pro", "Team collaboration", "Advanced integrations", "Dedicated support"],
+                popular: false,
+                cta: "Contact sales",
+              },
+            ].map((plan, index) => (
+              <motion.div
+                key={plan.name}
+                className={`relative bg-white dark:bg-gray-700 rounded-2xl shadow-lg border-2 p-8 ${plan.popular
+                    ? "border-blue-500 ring-4 ring-blue-100 dark:ring-blue-900"
+                    : "border-gray-200 dark:border-gray-600"
+                  }`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
 
-              {/* Enterprise Tier */}
-              <div className="border border-gray-200 dark:border-gray-700 shadow-sm divide-y divide-gray-200 dark:divide-gray-700 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm">
-                <div className="p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Premium</h3>
-                  <p className="mt-4 text-sm text-gray-500 dark:text-gray-300">For schools and organizations</p>
-                  <p className="mt-8">
-                    <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$29</span>
-                    <span className="text-base font-medium text-gray-500 dark:text-gray-300">/month</span>
-                  </p>
-                  <a
-                    href="/contact"
-                    className="mt-8 block w-full py-3 px-6 border border-transparent text-center font-medium text-white bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
-                  >
-                    Contact us
-                  </a>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
+                  <p className="mt-2 text-gray-600 dark:text-gray-300">{plan.description}</p>
+                  <div className="mt-6">
+                    <span className="text-5xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
+                    <span className="text-gray-600 dark:text-gray-300">/month</span>
+                  </div>
                 </div>
-                <div className="pt-6 pb-8 px-6">
-                  <h4 className="sr-only">Features</h4>
-                  <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">All Pro Features</p>
+
+                <ul className="mt-8 space-y-4">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={feature} className="flex items-center space-x-3">
+                      <CheckIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Chat Bot Integration</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Admin Priority Support</p>
-                    </li>
-                    <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Email Updates</p>
-                    </li>
-                    {/* <li className="flex items-start">
-                      <svg className="flex-shrink-0 h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <p className="ml-3 text-base text-gray-500 dark:text-gray-300">Dedicated account manager</p>
-                    </li> */}
-                  </ul>
-                </div>
-              </div>
-            </div>
+                  ))}
+                </ul>
+
+                <motion.button
+                  className={`w-full mt-8 py-3 px-6 rounded-lg font-semibold ${plan.popular
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-900 dark:text-white"
+                    }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {plan.cta}
+                </motion.button>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* CTA Section */}
-      <div className="bg-indigo-500 dark:bg-indigo-600">
-        <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            <span className="block">Ready to transform your learning?</span>
-            <span className="block">Start using Synapaxon today.</span>
-          </h2>
-          <p className="mt-4 text-lg leading-6 text-indigo-200 dark:text-indigo-300">
-            Join thousands of educators and learners who are already benefiting from our platform.
-          </p>
-          <a
-            href="/register"
-            className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium text-indigo-600 dark:text-white bg-white dark:bg-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-800 sm:w-auto"
+      <section className="py-24 bg-blue-600">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
           >
-            Sign up for free
-          </a>
-        </div>
-      </div>
-
-      {/* FAQ Section */}
-      <div id="faq" className="py-16 bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-indigo-500 dark:text-indigo-300 font-semibold tracking-wide uppercase">FAQs</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
-              Frequently asked questions
+            <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight">Build for your learning journey</h2>
+            <p className="mt-6 text-xl text-blue-100">
+              Whether you're a medical student, resident, or medical educator, Synapaxon provides the tools to create
+              engaging learning experiences that stick.
             </p>
-          </div>
-          <div className="mt-12">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-12">
-              <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  How do I create a quiz?
-                </dt>
-                <dd className="mt-2 text-base text-gray-500 dark:text-gray-300">
-                  After signing up, click "Create Questions" in your dashboard. Our intuitive editor will guide you through adding questions, answers, and multimedia.
-                </dd>
-              </div>
-              {/* <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  Can I share my quizzes with others?
-                </dt>
-                <dd className="mt-2 text-base text-gray-500 dark:text-gray-300">
-                  Absolutely! You can share via link, embed on websites, or contribute to our public library (optional).
-                </dd>
-              </div> */}
-              <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  What payment methods do you accept?
-                </dt>
-                <dd className="mt-2 text-base text-gray-500 dark:text-gray-300">
-                  We accept all major credit cards (Visa, Mastercard, American Express) and Stripe.
-                </dd>
-              </div>
-              <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  How can I contact support?
-                </dt>
-                <dd className="mt-2 text-base text-gray-500 dark:text-gray-300">
-                  Email us at support@synapaxon.com or use the chat widget in the app. Premium users get priority support.
-                </dd>
-              </div>
-            </dl>
-          </div>
+            <motion.div
+              className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <motion.a
+                href="/register"
+                className="inline-flex items-center bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-lg font-semibold space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span>Start building for free</span>
+                <ArrowRightIcon className="w-5 h-5" />
+              </motion.a>
+              <motion.a
+                href="#demo"
+                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-blue-600 text-white px-8 py-4 rounded-lg font-semibold space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <PlayIcon className="w-5 h-5" />
+                <span>Watch demo</span>
+              </motion.a>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
-        <div className="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
-          <nav className="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
-            <div className="px-5 py-2">
-              <a href="#" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Home
-              </a>
+      <footer className="bg-gray-900 dark:bg-black text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="text-xl font-bold">Synapaxon</span>
+              </div>
+              <p className="text-gray-400">
+                The modern learning platform for creating engaging educational experiences.
+              </p>
             </div>
-            <div className="px-5 py-2">
-              <a href="#features" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Features
-              </a>
+
+            <div>
+              <h3 className="font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a href="#features" className="hover:text-white">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#pricing" className="hover:text-white">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="/demo" className="hover:text-white">
+                    Demo
+                  </a>
+                </li>
+              </ul>
             </div>
-            <div className="px-5 py-2">
-              <a href="#pricing" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Pricing
-              </a>
+
+            <div>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a href="/about" className="hover:text-white">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="/contact" className="hover:text-white">
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a href="/careers" className="hover:text-white">
+                    Careers
+                  </a>
+                </li>
+              </ul>
             </div>
-            <div className="px-5 py-2">
-              <a href="#faq" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                FAQ
-              </a>
+
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a href="/help" className="hover:text-white">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="/privacy" className="hover:text-white">
+                    Privacy
+                  </a>
+                </li>
+                <li>
+                  <a href="/terms" className="hover:text-white">
+                    Terms
+                  </a>
+                </li>
+              </ul>
             </div>
-            <div className="px-5 py-2">
-              <a href="/contact" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Contact
-              </a>
-            </div>
-            <div className="px-5 py-2">
-              <a href="/privacy" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Privacy
-              </a>
-            </div>
-            <div className="px-5 py-2">
-              <a href="/terms" className="text-base text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                Terms
-              </a>
-            </div>
-          </nav>
+          </div>
+
+          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Synapaxon. All rights reserved.</p>
+          </div>
           <div className="mt-8 flex justify-center space-x-6">
             <a href="#" className="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-100">
               <span className="sr-only">Facebook</span>
@@ -502,13 +717,10 @@ function LandingPage() {
               </svg>
             </a>
           </div>
-          <p className="mt-8 text-center text-base text-gray-400 dark:text-gray-300">
-            &copy; 2023 Synapaxon. All rights reserved.
-          </p>
         </div>
       </footer>
     </div>
-  );
+  )
 }
 
-export default LandingPage;
+export default LandingPage

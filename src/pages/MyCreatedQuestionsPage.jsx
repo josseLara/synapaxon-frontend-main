@@ -18,6 +18,48 @@ const MyCreatedQuestionsPage = () => {
   const token = localStorage.getItem("token");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
+  // Filtros
+  const [filters, setFilters] = useState({
+    difficulty: '',
+    category: '',
+    subjects: []
+  });
+
+  const subjectsByCategory = {
+    'Basic Sciences': ['Anatomy', 'Physiology', 'Biochemistry', 'Pharmacology', 'Pathology', 'Microbiology'],
+    'Organ Systems': ['Cardiovascular', 'Respiratory', 'Gastrointestinal', 'Neurology', 'Endocrine', 'Renal'],
+    'Clinical Specialties': ['Internal Medicine', 'Surgery', 'Pediatrics', 'Obstetrics & Gynecology', 'Psychiatry', 'Radiology']
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'category' ? { subjects: [] } : {}) // Reset subjects when category changes
+    }));
+  };
+
+  const handleCategoryChange = (category) => {
+    setFilters(prev => ({
+      ...prev,
+      category,
+      subjects: [] // Reset subjects when category changes
+    }));
+  };
+
+  const handleSubjectToggle = (subject) => {
+    setFilters(prev => {
+      const subjectExists = prev.subjects.includes(subject);
+      return {
+        ...prev,
+        subjects: subjectExists
+          ? prev.subjects.filter(s => s !== subject)
+          : [...prev.subjects, subject]
+      };
+    });
+  };
+
   useEffect(() => {
     const handleStorageChange = () => {
       setTheme(localStorage.getItem("theme") || "light");
@@ -31,9 +73,18 @@ const MyCreatedQuestionsPage = () => {
     const fetchCreatedQuestions = async () => {
       try {
         if (!token) throw new Error("Authentication token not found");
-        const response = await axios.get(`/api/questions?createdBy=me`, {
+        
+        // Construir parámetros de consulta
+        const params = { createdBy: 'me' };
+        if (filters.difficulty) params.difficulty = filters.difficulty;
+        if (filters.category) params.category = filters.category;
+        if (filters.subjects.length > 0) params.subjects = filters.subjects.join(',');
+        
+        const response = await axios.get(`/api/questions`, {
+          params,
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         });
+        
         if (!response.data.success) throw new Error(response.data.message || "Failed to fetch questions");
         setQuestions(response.data.data || []);
         setTotalQuestions(response.data.count || 0);
@@ -44,8 +95,10 @@ const MyCreatedQuestionsPage = () => {
         setLoading(false);
       }
     };
+    
     fetchCreatedQuestions();
-  }, [token]);
+  }, [token, filters]);
+
 
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({ ...prev, [questionId]: !prev[questionId] }));
@@ -276,6 +329,7 @@ const MyCreatedQuestionsPage = () => {
       )}
 
       <div className="max-w-full mx-auto">
+         <div className="max-w-full mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200">My Created Questions</h1>
           <button
@@ -285,6 +339,98 @@ const MyCreatedQuestionsPage = () => {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Dashboard
           </button>
+        </div>
+
+        {/* Sección de Filtros */}
+        <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
+          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
+          
+          <div className="mb-6">
+            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Difficulty*</label>
+            <div className="flex space-x-4">
+              {['easy', 'medium', 'hard'].map((level) => (
+                <label key={level} className="flex items-center cursor-pointer text-gray-900 dark:text-gray-300">
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value={level}
+                    checked={filters.difficulty === level}
+                    onChange={handleInputChange}
+                    className="mr-2 accent-blue-600"
+                  />
+                  <span className="capitalize">{level}</span>
+                </label>
+              ))}
+              <button
+                type="button"
+                onClick={() => setFilters(prev => ({ ...prev, difficulty: '',category:'',subjects:'' }))}
+                className="ml-4 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Category*</label>
+            <div className="flex gap-2">
+              {['Basic Sciences', 'Organ Systems', 'Clinical Specialties'].map(cat => (
+                <button
+                  type="button"
+                  key={cat}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={`flex-1 py-3 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 ${
+                    filters.category === cat
+                      ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                      : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                  } backdrop-blur-sm`}
+                >
+                  {cat}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setFilters(prev => ({ ...prev, category: '' }))}
+                className="flex-1 py-3 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20 backdrop-blur-sm"
+              >
+                All Categories
+              </button>
+            </div>
+          </div>
+          
+          {filters.category && (
+            <div className="mb-6">
+              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
+                Select Subjects* (Click to select/deselect)
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {subjectsByCategory[filters.category]?.map((subject) => (
+                  <button
+                    type="button"
+                    key={subject}
+                    onClick={() => handleSubjectToggle(subject)}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${
+                      filters.subjects.includes(subject)
+                        ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                    } backdrop-blur-sm`}
+                  >
+                    {subject}
+                  </button>
+                ))}
+              </div>
+              {filters.subjects.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setFilters(prev => ({ ...prev, subjects: [] }))}
+                  className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Clear Subjects
+                </button>
+              )}
+            </div>
+          )}
+        </div>
         </div>
 
         <div className="bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20">
