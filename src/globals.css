@@ -71,7 +71,7 @@
 }
 
 .subject-item {
-  background-color: #1F2937;
+  /* background-color: #1F2937; */
   border-radius: 0.75rem;
   padding: 1.25rem;
   margin-bottom: 1.5rem;
@@ -87,7 +87,7 @@
 .subject-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #E5E7EB;
+  /* color: #E5E7EB; */
   display: flex;
   align-items: center;
 }
