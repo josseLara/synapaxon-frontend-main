@@ -19,8 +19,8 @@ return true;
 
 return (
 <div className="mt-6">
-<Card className="shadow-md hover:shadow-lg transition-all rounded-2xl overflow-hidden border-0">
-<CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+<Card className="backdrop-blur-lg shadow-md hover:shadow-lg transition-all rounded-2xl overflow-hidden border-0">
+<CardHeader className="flex flex-row items-center justify-between pb-2 dark:text-white">
 <CardTitle className="text-lg flex items-center">
 <FileText className="h-5 w-5 mr-2 text-blue-500" />
 Question Review
@@ -40,11 +40,10 @@ activeFilter === "incorrect" ? "Incorrect Answers" :
 </Badge>
 </span>
 </CardHeader>
-<CardContent className="p-0 pt-4">
+<CardContent className="p-0 pt-4 backdrop-blur-lg">
 <div className="space-y-3">
 {filteredPairs.map((pair) => {
 const performanceData = pairPerformance.current.find(p => p.pairId === pair.id);
-debugger;
 return (
 <QuestionCard
 key={pair.id}

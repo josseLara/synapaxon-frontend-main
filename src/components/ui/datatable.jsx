@@ -43,9 +43,9 @@ export const DataTable = ({ dataByCategory, icon: Icon }) => {
       {Object.entries(dataByCategory).map(([category, subjects]) => (
         <div
           key={category}
-          className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-6"
+          className="backdrop-blur-lg rounded-2xl p-6 shadow-lg dark:text-white border-gray-100 mb-6"
         >
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <h3 className="text-lg dark:text-blue-600 font-semibold text-gray-900 mb-4 flex items-center">
             <Icon className="mr-2 h-5 w-5 text-blue-500" />
             {category}
           </h3>
@@ -65,7 +65,7 @@ export const DataTable = ({ dataByCategory, icon: Icon }) => {
                   const totalQ = item.questions.length;
                   return (
                     <tr key={idx} className="border-b border-gray-50">
-                      <td className="py-2 font-medium text-gray-800">
+                      <td className="py-2 font-medium text-gray-800  dark:text-blue-600">
                         {item.subject}
                       </td>
                       <td className="text-center py-2 font-medium">{totalQ}</td>

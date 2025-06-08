@@ -4,7 +4,7 @@ import { Filter, Check, X, Flag } from 'lucide-react';
 
 const FilterSection = ({ activeFilter, setActiveFilter }) => {
   return (
-    <div className="mt-6 bg-white rounded-2xl p-5 border shadow-md hover:shadow-lg transition-all">
+    <div className="mt-6 backdrop-blur-lg rounded-2xl p-5 shadow-md hover:shadow-lg transition-all">
       <h4 className="text-sm font-medium text-gray-700 text-center mb-4 flex items-center justify-center">
         <Filter className="h-4 w-4 mr-2 text-blue-500" />
         Filter Questions By Result
@@ -63,7 +63,7 @@ const FilterSection = ({ activeFilter, setActiveFilter }) => {
       </div>
 
       <div className="flex justify-center">
-        <div className="bg-sky-50 text-sky-800 text-center text-xs p-2 rounded-md mt-4 border border-sky-200 w-full max-w-sm leading-relaxed">
+        <div className="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none h-10 px-4 py-2 flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white mt-3 cursor-pointer">
           {activeFilter === "all" ? "All Questions" : 
            activeFilter === "correct" ? "Correct Answers" : 
            activeFilter === "incorrect" ? "Incorrect Answers" : 

@@ -70,11 +70,11 @@ const TestRunnerPage = () => {
   };
 
   const darkHighlightColors = {
-  yellow: '#b59f3b', // Muted gold (better contrast with white text)
-  green: '#228B22',  // Forest green
-  pink: '#C71585',   // Medium violet pink
-  blue: '#1E90FF',   // Dodger blue (still bright but more readable)
-};
+    yellow: '#b59f3b', // Muted gold (better contrast with white text)
+    green: '#228B22',  // Forest green
+    pink: '#C71585',   // Medium violet pink
+    blue: '#1E90FF',   // Dodger blue (still bright but more readable)
+  };
 
   // Retrieve test data
   const testData = location.state || JSON.parse(sessionStorage.getItem('testData')) || {};
@@ -181,6 +181,7 @@ const TestRunnerPage = () => {
 
   // Apply dark mode
   useEffect(() => {
+
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -381,6 +382,7 @@ const TestRunnerPage = () => {
           questionId: question._id,
           selectedAnswer: userAnswers.find(a => a.questionId === question._id)?.selectedAnswer ?? -1,
           timeTaken: 0,
+          subjects: question.subjects?.map(s => s.name) || ['Unknown'],
         };
 
         const submitResponse = await axios.post('/api/student-questions/submit', payload, {
@@ -535,6 +537,7 @@ const TestRunnerPage = () => {
 
   // End test
   const handleEndTest = () => {
+    debugger;
     const unansweredExists = userAnswers.some(a => a.selectedAnswer === null && !submittedQuestions.includes(a.questionId));
     if (unansweredExists) {
       setShowUnansweredModal(true);
@@ -633,53 +636,53 @@ const TestRunnerPage = () => {
     );
   };
 
-const renderHighlightedText = (text, questionId) => {
-  if (!text) return null;
+  const renderHighlightedText = (text, questionId) => {
+    if (!text) return null;
 
-  const highlightsForQuestion = Object.entries(highlights).filter(
-    ([, value]) => value.questionId === questionId && text.includes(value.text)
-  );
+    const highlightsForQuestion = Object.entries(highlights).filter(
+      ([, value]) => value.questionId === questionId && text.includes(value.text)
+    );
 
-  if (highlightsForQuestion.length === 0) return <>{text}</>;
+    if (highlightsForQuestion.length === 0) return <>{text}</>;
 
-  // Track replacements as spans
-  const fragments = [];
-  let remainingText = text;
+    // Track replacements as spans
+    const fragments = [];
+    let remainingText = text;
 
-  highlightsForQuestion.forEach(([key, { text: highlightText, color: colorName }]) => {
-    const actualColor = isDarkMode ? darkHighlightColors[colorName] : lightHighlightColors[colorName];
+    highlightsForQuestion.forEach(([key, { text: highlightText, color: colorName }]) => {
+      const actualColor = isDarkMode ? darkHighlightColors[colorName] : lightHighlightColors[colorName];
 
-    const index = remainingText.indexOf(highlightText);
-    if (index !== -1) {
-      // Push text before match
-      if (index > 0) {
-        fragments.push(remainingText.slice(0, index));
+      const index = remainingText.indexOf(highlightText);
+      if (index !== -1) {
+        // Push text before match
+        if (index > 0) {
+          fragments.push(remainingText.slice(0, index));
+        }
+
+        // Push highlighted span
+        fragments.push(
+          <span
+            key={key}
+            data-key={key}
+            className="highlight text-gray-700 dark:text-gray-200"
+            style={{ backgroundColor: actualColor }}
+          >
+            {highlightText}
+          </span>
+        );
+
+        // Slice remaining text
+        remainingText = remainingText.slice(index + highlightText.length);
       }
+    });
 
-      // Push highlighted span
-      fragments.push(
-        <span
-          key={key}
-          data-key={key}
-          className="highlight text-gray-700 dark:text-gray-200"
-          style={{ backgroundColor: actualColor }}
-        >
-          {highlightText}
-        </span>
-      );
-
-      // Slice remaining text
-      remainingText = remainingText.slice(index + highlightText.length);
+    // Push any text left after the last match
+    if (remainingText) {
+      fragments.push(remainingText);
     }
-  });
 
-  // Push any text left after the last match
-  if (remainingText) {
-    fragments.push(remainingText);
-  }
-
-  return <>{fragments}</>;
-};
+    return <>{fragments}</>;
+  };
 
 
   // Loading state
@@ -728,9 +731,8 @@ const renderHighlightedText = (text, questionId) => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-[7.5%] bg-white dark:bg-gray-800 shadow-lg transform transition-transform ${
-          showSidebar ? 'translate-x-0' : '-translate-x-full'
-        } z-20 overflow-y-auto`}
+        className={`fixed inset-y-0 left-0 w-[7.5%] bg-white dark:bg-gray-800 shadow-lg transform transition-transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+          } z-20 overflow-y-auto`}
       >
         <div className="flex justify-between items-center p-2 border-b dark:border-gray-700">
           <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Questions</h2>
@@ -946,15 +948,15 @@ const renderHighlightedText = (text, questionId) => {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     {currentQuestion?.questionText
                       ? renderHighlightedText(
-                          typeof currentQuestion.questionText === 'object'
-                            ? currentQuestion.questionText.text
-                            : currentQuestion.questionText,
-                          currentQuestion._id
-                        )
+                        typeof currentQuestion.questionText === 'object'
+                          ? currentQuestion.questionText.text
+                          : currentQuestion.questionText,
+                        currentQuestion._id
+                      )
                       : 'No question text'}
                   </h2>
                 </div>
-                { currentQuestion?.questionMedia?.length > 0 && (
+                {currentQuestion?.questionMedia?.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {currentQuestion.questionMedia.map((media, index) => (
                       <ErrorBoundary key={index}>
@@ -974,17 +976,14 @@ const renderHighlightedText = (text, questionId) => {
                     return (
                       <div
                         key={index}
-                        className={`flex items-center p-4 border rounded-lg ${
-                          isQuestionSubmitted && isCorrect ? 'bg-green-100 dark:bg-green-900' : ''
-                        } ${
-                          isQuestionSubmitted && isSelectedIncorrect ? 'bg-red-100 dark:bg-red-900' : ''
-                        }`}
+                        className={`flex items-center p-4 border rounded-lg ${isQuestionSubmitted && isCorrect ? 'bg-green-100 dark:bg-green-900' : ''
+                          } ${isQuestionSubmitted && isSelectedIncorrect ? 'bg-red-100 dark:bg-red-900' : ''
+                          }`}
                       >
                         <button
                           onClick={() => !isQuestionSubmitted && handleAnswerSelect(index)}
-                          className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center ${
-                            isSelected ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
-                          } ${isQuestionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                          className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
+                            } ${isQuestionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                           disabled={isQuestionSubmitted}
                           aria-label={`Select option ${String.fromCharCode(65 + index)}`}
                         >
@@ -1006,9 +1005,9 @@ const renderHighlightedText = (text, questionId) => {
                           >
                             {option?.text
                               ? renderHighlightedText(
-                                  typeof option === 'object' ? option.text : option,
-                                  currentQuestion._id
-                                )
+                                typeof option === 'object' ? option.text : option,
+                                currentQuestion._id
+                              )
                               : 'No option text'}
                           </span>
                           {isQuestionSubmitted && option?.media?.length > 0 && (
@@ -1078,22 +1077,20 @@ const renderHighlightedText = (text, questionId) => {
                   <button
                     onClick={handlePrevQuestion}
                     disabled={currentQuestionIndex === 0}
-                    className={`px-4 py-2 rounded flex items-center ${
-                      currentQuestionIndex === 0
+                    className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === 0
                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                         : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
+                      }`}
                   >
                     <ChevronLeft size={16} className="mr-1" /> Previous
                   </button>
                   <button
                     onClick={handleNextQuestion}
                     disabled={currentQuestionIndex === questions.length - 1}
-                    className={`px-4 py-2 rounded flex items-center ${
-                      currentQuestionIndex === questions.length - 1
+                    className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === questions.length - 1
                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                         : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
+                      }`}
                   >
                     Next <ChevronRight size={16} className="ml-1" />
                   </button>
@@ -1102,11 +1099,10 @@ const renderHighlightedText = (text, questionId) => {
                   <button
                     onClick={() => handleSubmitQuestion()}
                     disabled={isQuestionSubmitted || submitting}
-                    className={`px-6 py-2 rounded flex items-center ${
-                      isQuestionSubmitted || submitting
+                    className={`px-6 py-2 rounded flex items-center ${isQuestionSubmitted || submitting
                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                         : 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
-                    }`}
+                      }`}
                   >
                     <Check size={16} className="mr-2" />
                     {submitting ? 'Submitting...' : isQuestionSubmitted ? 'Submitted' : 'Submit Question'}
@@ -1176,29 +1172,29 @@ const renderHighlightedText = (text, questionId) => {
                 </div>
               ) : (
                 <div>
-              {activeFeature === 'calculator' ? (
-                <div className="relative">
-                  <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
-                    <X size={16} />
-                  </button>
-                  <Calculator onClose={() => setActiveFeature('none')} />
+                  {activeFeature === 'calculator' ? (
+                    <div className="relative">
+                      <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
+                        <X size={16} />
+                      </button>
+                      <Calculator onClose={() => setActiveFeature('none')} />
+                    </div>
+                  ) : activeFeature === 'lab' ? (
+                    <div className="relative">
+                      <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
+                        <X size={16} />
+                      </button>
+                      <LabValuesModal onClose={() => setActiveFeature('none')} />
+                    </div>
+                  ) : activeFeature === 'chat' ? (
+                    <div className="text-center p-4 relative">
+                      <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
+                        <X size={16} />
+                      </button>
+                      <p className="text-gray-700 dark:text-gray-200">Chat feature coming soon!</p>
+                    </div>
+                  ) : null}
                 </div>
-              ) : activeFeature === 'lab' ? (
-                <div className="relative">
-                  <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
-                    <X size={16} />
-                  </button>
-                  <LabValuesModal onClose={() => setActiveFeature('none')} />
-                </div>
-              ) : activeFeature === 'chat' ? (
-                <div className="text-center p-4 relative">
-                  <button onClick={() => setActiveFeature('none')} className="absolute top-2 right-2 text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-300" aria-label="Close">
-                    <X size={16} />
-                  </button>
-                  <p className="text-gray-700 dark:text-gray-200">Chat feature coming soon!</p>
-                </div>
-              ) : null}
-            </div>
 
               )}
             </div>

@@ -1,28 +1,29 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 import {
-  CheckIcon,
-  MenuIcon,
-  XIcon,
+  ArrowRight,
+  CheckCircle,
+  Stethoscope,
+  Users,
+  Star,
+  Check,
+  Brain,
+  GraduationCap,
+  Award,
+  TrendingUp,
   SunIcon,
   MoonIcon,
-  BookOpenIcon,
-  UsersIcon,
-  TrendingUpIcon,
-  ArrowRightIcon,
-  PlayIcon,
-  StarIcon,
 } from "lucide-react"
-import { QuizCardIllustration } from "../components/quiz-card-illustration"
-import { LearningProcessIllustration } from "../components/learning-process-illustration"
+import { Button } from "../components/ui/button"
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
+import { useNavigate } from "react-router-dom"
 
-function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export default function LandingPage() {
+  const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"])
+   const navigate = useNavigate();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
@@ -48,679 +49,977 @@ function LandingPage() {
     }
   }
 
+  const handleNavigation = (path) => {
+    console.log(`Navigating to: ${path}`)
+    navigate(path)
+  }
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  const testimonials = [
+    {
+      name: "Dr. John Smith",
+      position: "Internal Medicine Resident, University Hospital",
+      image: "/testimonial-1.webp",
+      text: "Since using Synapaxon, I've improved my scores by 95%. The platform is intuitive and the questions are well structured by specialties.",
+    },
+    {
+      name: "Dr. Emily Johnson",
+      position: "5th Year Medical Student",
+      image: "/testimonial-3.jpeg",
+      text: "As a student, I needed a tool to help me review all subjects. Synapaxon has allowed me to study more efficiently.",
+    },
+    {
+      name: "Dr. Michael Brown",
+      position: "Cardiology Specialist, San Rafael Clinic",
+      image: "/testimonial-2.webp",
+      text: "The quality of questions and organization by organ systems has transformed how I teach residents.",
+    },
+  ]
+
+  const subscriptionsData = [
+    {
+      id: 1,
+      name: "Student",
+      price: 0,
+      description: "Ideal for medical students",
+      maxUsers: 1,
+      maxQuestions: 100,
+    },
+    {
+      id: 2,
+      name: "Professional",
+      price: 9,
+      description: "For residents and specialists",
+      maxUsers: 1,
+      maxQuestions: 1000,
+    },
+    {
+      id: 3,
+      name: "Institutional",
+      price: 29,
+      description: "For universities and hospitals",
+      maxUsers: 50,
+      maxQuestions: "Unlimited",
+    },
+  ]
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  }
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 0.8 } },
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen w-full bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Navigation */}
-      <motion.nav
-        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <motion.div className="flex items-center" whileHover={{ scale: 1.05 }}>
-              <div className="flex-shrink-0 flex items-center">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-white font-bold text-sm">S</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">Synapaxon</span>
-              </div>
-            </motion.div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-900 dark:text-white font-medium">
-                Why Synapaxon
-              </a>
-              <a
-                href="#features"
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-              >
-                Features
-              </a>
-              <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Pricing
-              </a>
-              <a href="#faq" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Resources
-              </a>
+      <header className="py-4 bg-gradient-to-r from-blue-900 to-blue-800 dark:from-blue-950 dark:to-blue-900 sticky top-0 z-50 transition-all duration-300">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <a href="/" className="flex items-center space-x-2 gap-2 font-semibold text-xl text-white">
+            <div className="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+              <Stethoscope className="h-5 w-5 text-white" />
             </div>
-
-            <div className="hidden md:flex items-center space-x-4">
-              <a
-                href="/login"
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium"
-              >
-                Sign in
-              </a>
-              <motion.a
-                href="/register"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span>Request Demo</span>
-                <ArrowRightIcon className="w-4 h-4" />
-              </motion.a>
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-              >
-                {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-              >
-                {mobileMenuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
-              </button>
-            </div>
+            Synapaxon
+          </a>
+          <nav className="hidden md:flex space-x-6">
+            <button
+              onClick={() => scrollToSection("features")}
+              className="text-white hover:text-blue-200 text-sm transition-colors"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => scrollToSection("testimonials")}
+              className="text-white hover:text-blue-200 text-sm transition-colors"
+            >
+              Testimonials
+            </button>
+            <button
+              onClick={() => scrollToSection("pricing")}
+              className="text-white hover:text-blue-200 text-sm transition-colors"
+            >
+              Pricing
+            </button>
+            <button
+              onClick={() => scrollToSection("faq")}
+              className="text-white hover:text-blue-200 text-sm transition-colors"
+            >
+              FAQ
+            </button>
+            <button
+              onClick={() => scrollToSection("contact")}
+              className="text-white hover:text-blue-200 text-sm transition-colors"
+            >
+              Contact
+            </button>
+          </nav>
+          <div className="flex gap-2 items-center">
+            <Button
+              variant="outline"
+              className="bg-blue-700 text-white border-white hover:bg-blue-600 text-sm transition-all duration-300"
+              onClick={() => handleNavigation("/register")}
+            >
+              Free Access
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-white border-white text-blue-700 hover:bg-blue-600 hover:text-white text-sm transition-all duration-300"
+              onClick={() => handleNavigation("/login")}
+            >
+              Login
+            </Button>
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors duration-200"
+            >
+              {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+            </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Why Synapaxon
-                </a>
-                <a
-                  href="#features"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Features
-                </a>
-                <a
-                  href="#pricing"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Pricing
-                </a>
-                <a
-                  href="#faq"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Resources
-                </a>
-                <div className="pt-4 pb-2 border-t border-gray-200 dark:border-gray-700">
-                  <a
-                    href="/login"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Sign in
-                  </a>
-                  <motion.a
-                    href="/register"
-                    className="block w-full mt-2 px-3 py-2 rounded-md text-base font-medium text-center text-white bg-blue-600 hover:bg-blue-700"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Request Demo
-                  </motion.a>
-                </div>
-                <div className="flex justify-center pt-2">
-                  <button
-                    onClick={toggleDarkMode}
-                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  >
-                    {isDarkMode ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+      </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white dark:bg-gray-800 pt-16 pb-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
-            <div className="lg:col-span-6">
-              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-                  The World's Most <span className="text-blue-600">Modern Medical Learning</span> Platform
-                </h1>
-                <p className="mt-6 text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-                  Synapaxon is the all-in-one platform for creating medical quizzes and personalized learning
-                  experiences to accelerate your medical education journey.
-                </p>
-                <motion.div
-                  className="mt-8"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <motion.a
-                    href="/register"
-                    className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold space-x-2"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span>Request Demo</span>
-                    <ArrowRightIcon className="w-5 h-5" />
-                  </motion.a>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            <div className="lg:col-span-6 mt-12 lg:mt-0">
+      <section className="py-15 md:py-25 pb-5 flex-grow bg-gradient-to-b from-blue-900 to-blue-800 dark:from-blue-950 dark:to-blue-900 relative overflow-hidden min-h-fit pt-[45px] transition-all duration-300">
+        <motion.div
+          className="absolute inset-0 opacity-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.1 }}
+          transition={{ duration: 1.5 }}
+        >
+          <div className="absolute top-0 left-0 w-full h-full">
+            {[...Array(20)].map((_, i) => (
               <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                style={{ y }}
+                key={i}
+                className="absolute text-white/20 text-4xl"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  y: [0, -20, 0],
+                  opacity: [0.1, 0.3, 0.1],
+                }}
+                transition={{
+                  duration: 4 + Math.random() * 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  delay: Math.random() * 2,
+                }}
               >
-                <QuizCardIllustration />
+                {["🩺", "🧠", "💊", "🫀", "🦴", "👁️"][Math.floor(Math.random() * 6)]}
               </motion.div>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* Value Proposition Section */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
-            <div className="lg:col-span-6 order-2 lg:order-1">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
+        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
+          <motion.div
+            className="space-y-8"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div>
+              <motion.span
+                className="inline-block px-4 py-1 rounded-full bg-blue-700/50 dark:bg-blue-800/50 text-white text-sm font-medium mb-4 backdrop-blur-sm"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
               >
-                <LearningProcessIllustration />
-              </motion.div>
+                Simplified Medical Education
+              </motion.span>
+              <motion.h1
+                className="text-4xl md:text-6xl font-bold text-white leading-tight"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                The <span className="text-blue-200 font-extrabold">Medical</span> Platform for Interactive Learning
+              </motion.h1>
             </div>
-
-            <div className="lg:col-span-6 order-1 lg:order-2">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
+            <motion.p
+              className="text-blue-100 text-lg md:pr-12 leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+            >
+              Master medical knowledge with our intuitive platform, designed for students, residents and professionals looking to optimize their medical learning.
+            </motion.p>
+            <motion.div
+              className="pt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <Button
+                className="bg-blue-700 hover:bg-blue-600 dark:bg-blue-800 dark:hover:bg-blue-700 text-white px-8 py-6 rounded-md flex items-center gap-2 text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => handleNavigation("/register")}
               >
-                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                  Medical education built for <span className="text-blue-600">tomorrow</span>, not yesterday
-                </h2>
+                Start Free <ArrowRight className="h-5 w-5" />
+              </Button>
+            </motion.div>
+            <motion.div
+              className="pt-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              <p className="text-blue-200 text-sm">Trusted by thousands of medical professionals:</p>
+              <div className="flex flex-wrap gap-6 items-center mt-4">
                 <motion.div
-                  className="mt-8"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  viewport={{ once: true }}
+                  className="bg-white/10 px-4 py-2 rounded backdrop-blur-sm"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <motion.a
-                    href="#features"
-                    className="inline-flex items-center bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold space-x-2"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span>Learn Why Synapaxon</span>
-                    <ArrowRightIcon className="w-5 h-5" />
-                  </motion.a>
+                  <div className="text-white text-sm">National University</div>
                 </motion.div>
-              </motion.div>
-            </div>
-          </div>
+                <motion.div
+                  className="bg-white/10 px-4 py-2 rounded backdrop-blur-sm"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="text-white text-sm">St. John's Hospital</div>
+                </motion.div>
+                <motion.div
+                  className="bg-white/10 px-4 py-2 rounded backdrop-blur-sm"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="text-white text-sm">Mayo Clinic</div>
+                </motion.div>
+                <motion.div
+                  className="bg-white/10 px-4 py-2 rounded backdrop-blur-sm"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="text-white text-sm">Harvard Medical</div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+          <motion.div
+            className="space-y-6"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              className="bg-gradient-to-r from-blue-800/50 to-blue-700/50 dark:from-blue-900/50 dark:to-blue-800/50 p-6 rounded-lg border border-blue-600/30 shadow-lg backdrop-blur-sm"
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="text-blue-200 h-5 w-5" />
+                <span className="text-blue-200 text-sm">Diagnostic Accuracy</span>
+              </div>
+              <div className="text-white text-3xl font-bold">98.5%</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-blue-200 text-xs">↑ 15%</span>
+                <span className="text-blue-300 text-xs">vs. traditional methods</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="bg-gradient-to-r from-blue-800/50 to-blue-700/50 dark:from-blue-900/50 dark:to-blue-800/50 p-6 rounded-lg border border-blue-600/30 shadow-lg backdrop-blur-sm"
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="text-blue-200 h-5 w-5" />
+                <span className="text-blue-200 text-sm">Optimized Study Time</span>
+              </div>
+              <div className="text-white text-3xl font-bold">40%</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-blue-200 text-xs">↓ 40%</span>
+                <span className="text-blue-300 text-xs">less time, better results</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="bg-gradient-to-r from-blue-800/50 to-blue-700/50 dark:from-blue-900/50 dark:to-blue-800/50 p-6 rounded-lg border border-blue-600/30 shadow-lg backdrop-blur-sm"
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="text-blue-200 h-5 w-5" />
+                <span className="text-blue-200 text-sm">Knowledge Retention</span>
+              </div>
+              <div className="text-white text-3xl font-bold">85%</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-blue-200 text-xs">↑ 60%</span>
+                <span className="text-blue-300 text-xs">better long-term retention</span>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
+
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-20 bg-white dark:bg-gray-900"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          style={{
+            clipPath: "polygon(0 100%, 100% 100%, 100% 0, 0 100%)",
+            height: "5rem",
+          }}
+        />
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div className="container mx-auto px-4">
           <motion.div
-            className="grid md:grid-cols-3 gap-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.2 }}
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true }}
+            variants={fadeIn}
           >
-            {[
-              {
-                icon: <BookOpenIcon className="w-8 h-8" />,
-                title: "Streamlined Creation",
-                description:
-                  "Build medical quizzes in minutes with our intuitive editor. Ready-to-go medical templates covering Ciencias Básicas, Sistemas de órganos, and Especialidades Clínicas.",
-              },
-              {
-                icon: <TrendingUpIcon className="w-8 h-8" />,
-                title: "Accelerate your Learning",
-                description:
-                  "Leverage analytics for smarter medical study habits. Track your progress across different medical specialties and difficulty levels.",
-              },
-              {
-                icon: <UsersIcon className="w-8 h-8" />,
-                title: "Built for Growth",
-                description:
-                  "From medical students to residents and practicing physicians. Our platform scales with your medical learning needs.",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-              >
-                <div className="flex justify-center mb-6">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center text-blue-600">
-                    {feature.icon}
-                  </div>
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-sm font-medium mb-4 transition-colors duration-300">
+              Features
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+              The Proven Choice
+            </h2>
+            <h3 className="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
+              For Efficient Medical Education
+            </h3>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={container}
+          >
+            <motion.div
+              className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+              variants={item}
+              whileHover={{ y: -10 }}
+            >
+              <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
+                <Brain className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                5.2K
+              </div>
+              <div className="flex items-center gap-1 mb-6">
+                <span className="text-blue-600 dark:text-blue-400 text-sm">↑ 35%</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
+                  medical questions
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Comprehensive Question Bank
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
+                Access thousands of questions organized by Basic Sciences, Organ Systems and Clinical Specialties with detailed explanations.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+              variants={item}
+              whileHover={{ y: -10 }}
+            >
+              <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
+                <Users className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                12.8K
+              </div>
+              <div className="flex items-center gap-1 mb-6">
+                <span className="text-blue-600 dark:text-blue-400 text-sm">↑ 55%</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
+                  active students
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Specialized Medical Interface
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
+                Designed specifically for medical professionals with precise terminology and intuitive navigation by specialties.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
+              variants={item}
+              whileHover={{ y: -10 }}
+            >
+              <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
+                <TrendingUp className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                <div className="w-full h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">📈 +95%</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Guaranteed Progress
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
+                Our adaptive methodology adjusts to your knowledge level, from student to specialist, ensuring continuous improvement.
+              </p>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Platform Features */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
-            <div className="lg:col-span-6">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                  Complete platform for <span className="text-blue-600">personalized medical education</span>
-                </h2>
-                <p className="mt-6 text-lg text-gray-600 dark:text-gray-300">
-                  Synapaxon provides the tools for you to create unique medical learning experiences covering all areas
-                  from basic sciences to clinical specialties. Enhance your knowledge retention while growing smarter
-                  and faster.
-                </p>
+      {/* How It Works Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-sm font-medium mb-4 transition-colors duration-300">
+              How It Works
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+              Simplify Your Medical Learning
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
+              Our platform is designed to make medical study efficient, structured and evidence-based.
+            </p>
+          </motion.div>
 
-                <div className="mt-8 space-y-4">
-                  {[
-                    "Medical Quiz Builder",
-                    "Performance Analytics",
-                    "Medical Progress Tracking",
-                    "Peer Learning",
-                    "Study Anywhere",
-                    "Clinical Case Studies",
-                  ].map((feature, index) => (
-                    <motion.div
-                      key={feature}
-                      className="flex items-center space-x-3"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                    </motion.div>
-                  ))}
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            <div className="hidden md:block absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-blue-200 dark:bg-blue-700 -z-10 transform -translate-y-1/2 transition-colors duration-300"></div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md text-center relative z-10 transition-colors duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="bg-blue-600 dark:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold transition-colors duration-300">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Select Your Specialty
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Choose from Basic Sciences, Organ Systems or Clinical Specialties according to your study level.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md text-center relative z-10 transition-colors duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="bg-blue-600 dark:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold transition-colors duration-300">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Practice with Real Cases
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Solve questions based on real clinical cases with different difficulty levels and immediate feedback.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-8 rounded-xl shadow-md text-center relative z-10 transition-colors duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="bg-blue-600 dark:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold transition-colors duration-300">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+                Analyze Your Progress
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Get detailed reports of your performance by specialty and identify improvement areas with personalized recommendations.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section
+        id="testimonials"
+        className="py-20 bg-gradient-to-b from-blue-900 to-blue-800 dark:from-blue-950 dark:to-blue-900 text-white transition-all duration-300"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-800/50 dark:bg-blue-900/50 text-blue-200 text-sm font-medium mb-4 backdrop-blur-sm">
+              Testimonials
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Users Say</h2>
+            <p className="text-blue-200 max-w-2xl mx-auto">
+              Students, residents and specialists worldwide trust Synapaxon for their medical training.
+            </p>
+          </motion.div>
+
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              className="bg-blue-800/50 dark:bg-blue-900/50 p-8 rounded-xl backdrop-blur-sm border border-blue-600/30"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center border-2 border-blue-400">
+                    <Stethoscope className="w-8 h-8 text-white" />
+                  </div>
                 </div>
-
-                <motion.div
-                  className="mt-8"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  <motion.a
-                    href="#pricing"
-                    className="inline-flex items-center bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg font-semibold space-x-2"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                <div>
+                  <div className="flex mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  <motion.p
+                    className="text-lg mb-6 italic"
+                    key={activeTestimonial}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <span>Learn About Our Platform</span>
-                    <ArrowRightIcon className="w-5 h-5" />
-                  </motion.a>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            <div className="lg:col-span-6 mt-12 lg:mt-0">
-              <motion.div
-                className="relative"
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-              >
-                {/* Platform Preview */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Quiz Dashboard</h3>
-                    <div className="flex space-x-2">
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                          <span className="text-blue-600 text-sm font-bold">AB</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Basic Anatomy</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">25 questions</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4.8</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                          <span className="text-green-600 text-sm font-bold">FC</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Cardiovascular Physiology</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">30 questions</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4.9</span>
-                      </div>
-                    </div>
-                  </div>
+                    "{testimonials[activeTestimonial].text}"
+                  </motion.p>
+                  <motion.div
+                    key={`name-${activeTestimonial}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h4 className="font-bold text-lg">{testimonials[activeTestimonial].name}</h4>
+                    <p className="text-blue-300">{testimonials[activeTestimonial].position}</p>
+                  </motion.div>
                 </div>
+              </div>
+            </motion.div>
 
-                {/* Floating Elements */}
-                <motion.div
-                  className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
-                >
-                  95%
-                </motion.div>
-
-                <motion.div
-                  className="absolute -bottom-4 -left-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg"
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                >
-                  ✓
-                </motion.div>
-              </motion.div>
+            <div className="flex justify-center mt-8 gap-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${activeTestimonial === index ? "bg-blue-300 w-6" : "bg-blue-700"
+                    }`}
+                  aria-label={`View testimonial ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="pricing" className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true }}
+            variants={fadeIn}
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
-              Simple, transparent pricing
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-sm font-medium mb-4 transition-colors duration-300">
+              Pricing
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+              Simple and Transparent Plans
             </h2>
-            <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">Start for free, upgrade when you need more.</p>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
+              Start free and scale according to your learning needs. No surprises or hidden costs.
+            </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Free",
-                price: "$0",
-                description: "Perfect for getting started",
-                features: ["Up to 5 quizzes", "Basic question types", "Community support"],
-                popular: false,
-                cta: "Get started",
-              },
-              {
-                name: "Pro",
-                price: "$9",
-                description: "For serious learners and educators",
-                features: ["Unlimited quizzes", "Advanced analytics", "Priority support", "Custom branding"],
-                popular: true,
-                cta: "Start free trial",
-              },
-              {
-                name: "Premium",
-                price: "$29",
-                description: "For schools and organizations",
-                features: ["Everything in Pro", "Team collaboration", "Advanced integrations", "Dedicated support"],
-                popular: false,
-                cta: "Contact sales",
-              },
-            ].map((plan, index) => (
-              <motion.div
-                key={plan.name}
-                className={`relative bg-white dark:bg-gray-700 rounded-2xl shadow-lg border-2 p-8 ${plan.popular
-                    ? "border-blue-500 ring-4 ring-blue-100 dark:ring-blue-900"
-                    : "border-gray-200 dark:border-gray-600"
+            {subscriptionsData.map((sub) => (
+              <Card
+                key={sub.id}
+                className={`relative flex flex-col justify-between cursor-pointer transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-800 ${sub.name.toLowerCase() === "professional"
+                    ? "border-blue-500 ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900 shadow-lg shadow-blue-500/10"
+                    : "border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800"
                   }`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5 }}
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
-                    </span>
+                {sub.name.toLowerCase() === "professional" && (
+                  <div className="absolute -right-1 -top-1 rounded-bl-md rounded-tr-md bg-blue-500 px-3 py-1 text-xs font-medium text-white shadow-md">
+                    Recommended
                   </div>
                 )}
-
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
-                  <p className="mt-2 text-gray-600 dark:text-gray-300">{plan.description}</p>
-                  <div className="mt-6">
-                    <span className="text-5xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                    <span className="text-gray-600 dark:text-gray-300">/month</span>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-xl text-gray-900 dark:text-white transition-colors duration-300">
+                    {sub.name.toLowerCase() === "student" ? (
+                      <GraduationCap className="h-6 w-6 text-blue-500" />
+                    ) : sub.name.toLowerCase() === "professional" ? (
+                      <Stethoscope className="h-6 w-6 text-blue-500" />
+                    ) : (
+                      <Award className="h-6 w-6 text-blue-500" />
+                    )}
+                    {sub.name} Plan
+                  </CardTitle>
+                  <CardDescription className="text-gray-500 dark:text-gray-400 transition-colors duration-300">
+                    {sub.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-6 text-4xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
+                    ${sub.price} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">USD/month</span>
                   </div>
-                </div>
-
-                <ul className="mt-8 space-y-4">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={feature} className="flex items-center space-x-3">
-                      <CheckIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-3">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                        Up to {sub.maxUsers} user{sub.maxUsers > 1 ? "s" : ""}
+                      </span>
                     </li>
-                  ))}
-                </ul>
-
-                <motion.button
-                  className={`w-full mt-8 py-3 px-6 rounded-lg font-semibold ${plan.popular
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-900 dark:text-white"
-                    }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {plan.cta}
-                </motion.button>
-              </motion.div>
+                    <li className="flex items-center gap-3">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                        {sub.maxQuestions} questions
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                        {sub.name.toLowerCase() === "student"
+                          ? "Email support"
+                          : sub.name.toLowerCase() === "professional"
+                            ? "Priority support"
+                            : "24/7 dedicated support"}
+                      </span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter className="pt-4">
+                  <Button
+                    className={`w-full h-11 transition-all duration-300 ${sub.name.toLowerCase() === "professional"
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : "border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 bg-transparent border"
+                      }`}
+                    onClick={() => handleNavigation("/register")}
+                  >
+                    Select
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
+        <div className="container mx-auto px-4">
           <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-sm font-medium mb-4 transition-colors duration-300">
+              Frequently Asked Questions
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+              Answers to Your Questions
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
+              Everything you need to know about our medical learning platform.
+            </p>
+          </motion.div>
+
+          <div className="max-w-3xl mx-auto grid gap-6">
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm transition-colors duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                How are the questions organized?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Questions are categorized into Basic Sciences (Anatomy, Physiology, Biochemistry), Organ Systems (Cardiovascular, Respiratory, etc.) and Clinical Specialties (Internal Medicine, Surgery, Pediatrics).
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm transition-colors duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                Can I filter questions by difficulty?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Yes, you can filter by status (Correct, Incorrect, Not attempted, Marked) and by difficulty level to customize your study experience.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm transition-colors duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                Are the questions based on real cases?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Absolutely. All our questions are based on real clinical cases and are reviewed by medical specialists to ensure their accuracy and relevance.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm transition-colors duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                How does progress tracking work?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                Our analytics system provides detailed reports of your performance by specialty, identifies improvement areas and gives personalized study recommendations.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section
+        id="contact"
+        className="py-20 bg-gradient-to-b from-blue-900 to-blue-800 dark:from-blue-950 dark:to-blue-900 text-white transition-all duration-300"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight">Build for your learning journey</h2>
-            <p className="mt-6 text-xl text-blue-100">
-              Whether you're a medical student, resident, or medical educator, Synapaxon provides the tools to create
-              engaging learning experiences that stick.
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Start Mastering Medicine Today</h2>
+            <p className="text-blue-200 text-lg mb-8">
+              Join thousands of medical students and professionals who have transformed their learning with Synapaxon. Start free, no commitments.
             </p>
-            <motion.div
-              className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <motion.a
-                href="/register"
-                className="inline-flex items-center bg-white hover:bg-gray-100 text-blue-600 px-8 py-4 rounded-lg font-semibold space-x-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 font-medium transition-all duration-300"
+                onClick={() => handleNavigation("/register")}
               >
-                <span>Start building for free</span>
-                <ArrowRightIcon className="w-5 h-5" />
-              </motion.a>
-              <motion.a
-                href="#demo"
-                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-blue-600 text-white px-8 py-4 rounded-lg font-semibold space-x-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                Start Free
+              </Button>
+              <Button
+                variant="default"
+                className="bg-white text-blue-700 px-8 py-6 text-base font-medium hover:bg-blue-100 transition-all duration-300"
+                onClick={() => window.open("mailto:support@synapaxon.com", "_blank")}
               >
-                <PlayIcon className="w-5 h-5" />
-                <span>Watch demo</span>
-              </motion.a>
-            </motion.div>
+                Contact Support
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 dark:bg-black text-gray-400 py-12 transition-colors duration-300">
+        <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-white font-bold text-sm">S</span>
+              <a href="/" className="flex items-center space-x-2 gap-2 font-semibold text-xl text-white mb-4">
+                <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Stethoscope className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Synapaxon</span>
-              </div>
-              <p className="text-gray-400">
-                The modern learning platform for creating engaging educational experiences.
+                Synapaxon
+              </a>
+              <p className="mb-4">
+                Medical learning platform for students, residents and healthcare professionals.
               </p>
+              <div className="flex gap-4">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <span className="sr-only">Facebook</span>
+                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <span className="sr-only">Instagram</span>
+                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <span className="sr-only">Twitter</span>
+                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                  </svg>
+                </a>
+              </div>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
+              <h3 className="text-white font-bold mb-4">Product</h3>
+              <ul className="space-y-2">
                 <li>
-                  <a href="#features" className="hover:text-white">
+                  <a href="#" className="hover:text-white transition-colors">
                     Features
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-white">
+                  <a href="#" className="hover:text-white transition-colors">
                     Pricing
                   </a>
                 </li>
                 <li>
-                  <a href="/demo" className="hover:text-white">
-                    Demo
+                  <a href="#" className="hover:text-white transition-colors">
+                    Specialties
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Updates
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
+              <h3 className="text-white font-bold mb-4">Resources</h3>
+              <ul className="space-y-2">
                 <li>
-                  <a href="/about" className="hover:text-white">
-                    About
+                  <a href="#" className="hover:text-white transition-colors">
+                    Medical Blog
                   </a>
                 </li>
                 <li>
-                  <a href="/contact" className="hover:text-white">
+                  <a href="#" className="hover:text-white transition-colors">
+                    Study Guides
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Clinical Cases
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Documentation
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Help Center
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white font-bold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Universities
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Careers
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
                     Contact
                   </a>
                 </li>
                 <li>
-                  <a href="/careers" className="hover:text-white">
-                    Careers
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="/help" className="hover:text-white">
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a href="/privacy" className="hover:text-white">
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a href="/terms" className="hover:text-white">
-                    Terms
+                  <a href="#" className="hover:text-white transition-colors">
+                    Press
                   </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Synapaxon. All rights reserved.</p>
-          </div>
-          <div className="mt-8 flex justify-center space-x-6">
-            <a href="#" className="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-100">
-              <span className="sr-only">Facebook</span>
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
-              </svg>
-            </a>
-            <a href="#" className="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-100">
-              <span className="sr-only">Twitter</span>
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-              </svg>
-            </a>
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p>© 2024 Synapaxon. All rights reserved.</p>
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <a href="#" className="hover:text-white transition-colors">
+                Terms
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Cookies
+              </a>
+            </div>
           </div>
         </div>
       </footer>
     </div>
   )
 }
-
-export default LandingPage
