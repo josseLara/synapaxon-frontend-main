@@ -170,7 +170,6 @@ export default function QuestionFilterPage() {
         });
       }
     }
-
     return result;
   }, [questions, selectedSubjects, selectedTopics]);
 

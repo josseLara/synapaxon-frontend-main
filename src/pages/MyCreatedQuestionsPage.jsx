@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp, Image as ImageIcon, Edit, Trash2, ArrowLeft, X } from "lucide-react";
 import axios from '../api/axiosConfig';
 import MediaDisplay from './MediaDisplay';
+import { subjectsByCategory, topicsBySubject } from "../data/questionData";
 
 const MyCreatedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -22,14 +23,15 @@ const MyCreatedQuestionsPage = () => {
   const [filters, setFilters] = useState({
     difficulty: '',
     category: '',
-    subjects: []
+    subjects: [],
+    topics: []
   });
 
-  const subjectsByCategory = {
-    'Basic Sciences': ['Anatomy', 'Physiology', 'Biochemistry', 'Pharmacology', 'Pathology', 'Microbiology'],
-    'Organ Systems': ['Cardiovascular', 'Respiratory', 'Gastrointestinal', 'Neurology', 'Endocrine', 'Renal'],
-    'Clinical Specialties': ['Internal Medicine', 'Surgery', 'Pediatrics', 'Obstetrics & Gynecology', 'Psychiatry', 'Radiology']
-  };
+  // const subjectsByCategory = {
+  //   'Basic Sciences': ['Anatomy', 'Physiology', 'Biochemistry', 'Pharmacology', 'Pathology', 'Microbiology'],
+  //   'Organ Systems': ['Cardiovascular', 'Respiratory', 'Gastrointestinal', 'Neurology', 'Endocrine', 'Renal'],
+  //   'Clinical Specialties': ['Internal Medicine', 'Surgery', 'Pediatrics', 'Obstetrics & Gynecology', 'Psychiatry', 'Radiology']
+  // };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -73,18 +75,19 @@ const MyCreatedQuestionsPage = () => {
     const fetchCreatedQuestions = async () => {
       try {
         if (!token) throw new Error("Authentication token not found");
-        
+
         // Construir parámetros de consulta
         const params = { createdBy: 'me' };
         if (filters.difficulty) params.difficulty = filters.difficulty;
         if (filters.category) params.category = filters.category;
         if (filters.subjects.length > 0) params.subjects = filters.subjects.join(',');
-        
+        if (filters.topics.length > 0) params.topics = filters.topics.join(','); // Nuevo parámetro
+
         const response = await axios.get(`/api/questions`, {
           params,
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         });
-        
+
         if (!response.data.success) throw new Error(response.data.message || "Failed to fetch questions");
         setQuestions(response.data.data || []);
         setTotalQuestions(response.data.count || 0);
@@ -95,9 +98,23 @@ const MyCreatedQuestionsPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchCreatedQuestions();
   }, [token, filters]);
+
+  // Nuevo handler para selección de temas
+  const handleTopicToggle = (topic) => {
+    setFilters(prev => {
+      const topicExists = prev.topics.includes(topic);
+      return {
+        ...prev,
+        topics: topicExists
+          ? prev.topics.filter(t => t !== topic)
+          : [...prev.topics, topic]
+      };
+    });
+  };
+
 
 
   const toggleQuestion = (questionId) => {
@@ -272,11 +289,10 @@ const MyCreatedQuestionsPage = () => {
                       <button
                         type="button"
                         onClick={() => setEditQuestionData({ ...editQuestionData, correctAnswer: index })}
-                        className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center border border-white/40 dark:border-gray-700/30 ${
-                          editQuestionData.correctAnswer === index
-                            ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
-                            : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
-                        }`}
+                        className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center border border-white/40 dark:border-gray-700/30 ${editQuestionData.correctAnswer === index
+                          ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
+                          : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                          }`}
                       >
                         {String.fromCharCode(65 + index)}
                       </button>
@@ -329,108 +345,149 @@ const MyCreatedQuestionsPage = () => {
       )}
 
       <div className="max-w-full mx-auto">
-         <div className="max-w-full mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200">My Created Questions</h1>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center px-4 py-2 bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-black/20 transition backdrop-blur-sm border border-white/40 dark:border-gray-700/30"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Dashboard
-          </button>
-        </div>
+        <div className="max-w-full mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200">My Created Questions</h1>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="flex items-center px-4 py-2 bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-black/20 transition backdrop-blur-sm border border-white/40 dark:border-gray-700/30"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Dashboard
+            </button>
+          </div>
 
-        {/* Sección de Filtros */}
-        <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
-          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
-          
-          <div className="mb-6">
-            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Difficulty*</label>
-            <div className="flex space-x-4">
-              {['easy', 'medium', 'hard'].map((level) => (
-                <label key={level} className="flex items-center cursor-pointer text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value={level}
-                    checked={filters.difficulty === level}
-                    onChange={handleInputChange}
-                    className="mr-2 accent-blue-600"
-                  />
-                  <span className="capitalize">{level}</span>
-                </label>
-              ))}
-              <button
-                type="button"
-                onClick={() => setFilters(prev => ({ ...prev, difficulty: '',category:'',subjects:'' }))}
-                className="ml-4 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          
-          <div className="mb-6">
-            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Category*</label>
-            <div className="flex gap-2">
-              {['Basic Sciences', 'Organ Systems', 'Clinical Specialties'].map(cat => (
-                <button
-                  type="button"
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={`flex-1 py-3 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 ${
-                    filters.category === cat
-                      ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
-                      : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
-                  } backdrop-blur-sm`}
-                >
-                  {cat}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => setFilters(prev => ({ ...prev, category: '' }))}
-                className="flex-1 py-3 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20 backdrop-blur-sm"
-              >
-                All Categories
-              </button>
-            </div>
-          </div>
-          
-          {filters.category && (
+          {/* Sección de Filtros */}
+          {/* Sección de Filtros */}
+          <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
+            <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
+
+            {/* Filtro de dificultad */}
             <div className="mb-6">
-              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
-                Select Subjects* (Click to select/deselect)
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {subjectsByCategory[filters.category]?.map((subject) => (
+              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Difficulty</label>
+              <div className="flex space-x-4">
+                {['easy', 'medium', 'hard'].map((level) => (
                   <button
+                    key={level}
                     type="button"
-                    key={subject}
-                    onClick={() => handleSubjectToggle(subject)}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${
-                      filters.subjects.includes(subject)
+                    onClick={() => setFilters(prev => ({ ...prev, difficulty: prev.difficulty === level ? '' : level }))}
+                    className={`px-4 py-2 rounded-lg font-medium backdrop-blur-sm border border-white/40 dark:border-gray-700/30 ${filters.difficulty === level
                         ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
                         : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
-                    } backdrop-blur-sm`}
+                      }`}
                   >
-                    {subject}
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
                   </button>
                 ))}
               </div>
-              {filters.subjects.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setFilters(prev => ({ ...prev, subjects: [] }))}
-                  className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  Clear Subjects
-                </button>
-              )}
             </div>
-          )}
-        </div>
+
+            {/* Filtro de categoría */}
+            <div className="mb-6">
+              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Category</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {Object.keys(subjectsByCategory).map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => handleCategoryChange(category)}
+                    className={`py-3 px-4 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 ${filters.category === category
+                        ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                      } backdrop-blur-sm`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Filtro de asignaturas (solo si hay categoría seleccionada) */}
+            {filters.category && (
+              <div className="mb-6">
+                <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
+                  Select Subjects (Click to select/deselect)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {subjectsByCategory[filters.category]?.map((subject) => (
+                    <button
+                      key={subject}
+                      type="button"
+                      onClick={() => handleSubjectToggle(subject)}
+                      className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.subjects.includes(subject)
+                          ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                          : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                        } backdrop-blur-sm`}
+                    >
+                      {subject}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Filtro de temas (solo si hay asignaturas seleccionadas) */}
+            {filters.subjects.length > 0 && (
+              <div className="mb-6">
+                <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
+                  Select Topics (Click to select/deselect)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {filters.subjects.flatMap(subject =>
+                    (topicsBySubject[subject] || []).map(topic => (
+                      <button
+                        key={topic}
+                        type="button"
+                        onClick={() => handleTopicToggle(topic)}
+                        className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.topics.includes(topic)
+                            ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
+                            : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                          } backdrop-blur-sm`}
+                      >
+                        {topic}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mostrar filtros aplicados */}
+            {(filters.difficulty || filters.category || filters.subjects.length > 0 || filters.topics.length > 0) && (
+              <div className="mt-6">
+                <h4 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Applied Filters:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {filters.difficulty && (
+                    <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                      Difficulty: {filters.difficulty}
+                    </span>
+                  )}
+                  {filters.category && (
+                    <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                      Category: {filters.category}
+                    </span>
+                  )}
+                  {filters.subjects.map(subject => (
+                    <span key={subject} className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                      Subject: {subject}
+                    </span>
+                  ))}
+                  {filters.topics.map(topic => (
+                    <span key={topic} className="px-3 py-1 bg-green-600/30 dark:bg-green-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-green-500/40 dark:border-green-500/30">
+                      Topic: {topic}
+                    </span>
+                  ))}
+                  <button
+                    onClick={() => setFilters({ difficulty: '', category: '', subjects: [], topics: [] })}
+                    className="px-3 py-1 bg-red-600/30 dark:bg-red-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm hover:bg-red-700/40 dark:hover:bg-red-700/30 border border-red-500/40 dark:border-red-500/30"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
 
         <div className="bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20">
@@ -499,11 +556,10 @@ const MyCreatedQuestionsPage = () => {
                           {question.options?.map((option, oIndex) => (
                             <div
                               key={option._id || oIndex}
-                              className={`p-4 rounded-lg flex items-center space-x-4 ${
-                                question.correctAnswer === oIndex
-                                  ? "bg-blue-600/30 dark:bg-blue-600/20 border border-blue-500/40 dark:border-blue-500/30"
-                                  : "bg-white/30 dark:bg-black/20 border border-white/40 dark:border-gray-700/30"
-                              } backdrop-blur-sm`}
+                              className={`p-4 rounded-lg flex items-center space-x-4 ${question.correctAnswer === oIndex
+                                ? "bg-blue-600/30 dark:bg-blue-600/20 border border-blue-500/40 dark:border-blue-500/30"
+                                : "bg-white/30 dark:bg-black/20 border border-white/40 dark:border-gray-700/30"
+                                } backdrop-blur-sm`}
                             >
                               <div className="flex-shrink-0">
                                 {question.correctAnswer === oIndex ? (

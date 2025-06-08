@@ -333,6 +333,7 @@ const TestRunnerPage = () => {
               options: questionData.options || currentQuestion.options,
               correctAnswer: questionData.correctAnswer ?? currentQuestion.correctAnswer,
               subjects: questionData.subjects || currentQuestion.subjects,
+              topics: questionData.topics || currentQuestion.topics,
             };
             return updated;
           });
@@ -383,6 +384,7 @@ const TestRunnerPage = () => {
           selectedAnswer: userAnswers.find(a => a.questionId === question._id)?.selectedAnswer ?? -1,
           timeTaken: 0,
           subjects: question.subjects?.map(s => s.name) || ['Unknown'],
+          topics: question.topics?.map(s => s.name) || ['Unknown'],
         };
 
         const submitResponse = await axios.post('/api/student-questions/submit', payload, {
@@ -537,7 +539,6 @@ const TestRunnerPage = () => {
 
   // End test
   const handleEndTest = () => {
-    debugger;
     const unansweredExists = userAnswers.some(a => a.selectedAnswer === null && !submittedQuestions.includes(a.questionId));
     if (unansweredExists) {
       setShowUnansweredModal(true);

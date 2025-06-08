@@ -23,6 +23,12 @@ const AttemptedQuestionsPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [filters, setFilters] = useState({
+    difficulty: '',
+    category: '',
+    subjects: [],
+    topics: []
+  });
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -37,12 +43,16 @@ const AttemptedQuestionsPage = () => {
     try {
       setLoading(true);
       let url = `/api/student-questions/history?page=${pagination.current}&limit=${pagination.limit}`;
+
+      // Añadir filtro de estado (correct/incorrect)
       if (questionStatusFilter === "correct") url += "&isCorrect=true";
       if (questionStatusFilter === "incorrect") url += "&isCorrect=false&flagged=false";
-      if (difficulty) url += `&difficulty=${difficulty}`;
-      if (selectedCategory) url += `&category=${selectedCategory}`;
-      if (selectedSubject) url += `&subject=${selectedSubject}`;
-      if (selectedTopic) url += `&topic=${selectedTopic}`;
+
+      // Añadir filtros del objeto filters
+      if (filters.difficulty) url += `&difficulty=${filters.difficulty}`;
+      if (filters.category) url += `&category=${filters.category}`;
+      if (filters.subjects.length > 0) url += `&subjects=${filters.subjects.join(",")}`;
+      if (filters.topics.length > 0) url += `&topics=${filters.topics.join(",")}`;
 
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -76,23 +86,54 @@ const AttemptedQuestionsPage = () => {
     }
   };
 
+  const handleCategoryChange = (category) => {
+    setFilters({
+      difficulty: filters.difficulty,
+      category,
+      subjects: [],
+      topics: []
+    });
+  };
+
+  const handleSubjectToggle = (subject) => {
+    setFilters(prev => {
+      const subjectExists = prev.subjects.includes(subject);
+      return {
+        ...prev,
+        subjects: subjectExists
+          ? prev.subjects.filter(s => s !== subject)
+          : [...prev.subjects, subject],
+        topics: subjectExists ? prev.topics : [] // Reset topics when changing subjects
+      };
+    });
+  };
+
+  const handleTopicToggle = (topic) => {
+    setFilters(prev => {
+      const topicExists = prev.topics.includes(topic);
+      return {
+        ...prev,
+        topics: topicExists
+          ? prev.topics.filter(t => t !== topic)
+          : [...prev.topics, topic]
+      };
+    });
+  };
+
   const fetchCounts = async () => {
     try {
       const allRes = await axios.get(
-        `/api/student-questions/history?${difficulty ? `difficulty=${difficulty}&` : ""}${
-          selectedCategory ? `category=${selectedCategory}&` : ""
+        `/api/student-questions/history?${difficulty ? `difficulty=${difficulty}&` : ""}${selectedCategory ? `category=${selectedCategory}&` : ""
         }${selectedSubject ? `subject=${selectedSubject}&` : ""}${selectedTopic ? `topic=${selectedTopic}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const correctRes = await axios.get(
-        `/api/student-questions/history?isCorrect=true${difficulty ? `&difficulty=${difficulty}` : ""}${
-          selectedCategory ? `&category=${selectedCategory}` : ""
+        `/api/student-questions/history?isCorrect=true${difficulty ? `&difficulty=${difficulty}` : ""}${selectedCategory ? `&category=${selectedCategory}` : ""
         }${selectedSubject ? `&subject=${selectedSubject}&` : ""}${selectedTopic ? `topic=${selectedTopic}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const incorrectRes = await axios.get(
-        `/api/student-questions/history?isCorrect=false&flagged=false${difficulty ? `&difficulty=${difficulty}` : ""}${
-          selectedCategory ? `&category=${selectedCategory}&` : ""
+        `/api/student-questions/history?isCorrect=false&flagged=false${difficulty ? `&difficulty=${difficulty}` : ""}${selectedCategory ? `&category=${selectedCategory}&` : ""
         }${selectedSubject ? `subject=${selectedSubject}&` : ""}${selectedTopic ? `topic=${selectedTopic}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -106,10 +147,10 @@ const AttemptedQuestionsPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCounts();
-    fetchQuestions();
-  }, [questionStatusFilter, difficulty, selectedCategory, selectedSubject, selectedTopic, pagination.current]);
+useEffect(() => {
+  fetchCounts();
+  fetchQuestions();
+}, [questionStatusFilter, filters, pagination.current]); // Usar filters como dependencia
 
   const filteredQuestions = useMemo(() => questions, [questions]);
 
@@ -153,6 +194,136 @@ const AttemptedQuestionsPage = () => {
           </button>
         </div>
 
+        {/* Sección de Filtros */}
+        <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
+          <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
+
+          {/* Filtro de dificultad */}
+          <div className="mb-6">
+            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Difficulty</label>
+            <div className="flex space-x-4">
+              {['easy', 'medium', 'hard'].map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setFilters(prev => ({ ...prev, difficulty: prev.difficulty === level ? '' : level }))}
+                  className={`px-4 py-2 rounded-lg font-medium backdrop-blur-sm border border-white/40 dark:border-gray-700/30 ${filters.difficulty === level
+                    ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                    : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                    }`}
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtro de categoría */}
+          <div className="mb-6">
+            <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">Category</label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {Object.keys(subjectsByCategory).map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => handleCategoryChange(category)}
+                  className={`py-3 px-4 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 ${filters.category === category
+                    ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                    : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                    } backdrop-blur-sm`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtro de asignaturas (solo si hay categoría seleccionada) */}
+          {filters.category && (
+            <div className="mb-6">
+              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
+                Select Subjects (Click to select/deselect)
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {subjectsByCategory[filters.category]?.map((subject) => (
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => handleSubjectToggle(subject)}
+                    className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.subjects.includes(subject)
+                      ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                      : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                      } backdrop-blur-sm`}
+                  >
+                    {subject}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Filtro de temas (solo si hay asignaturas seleccionadas) */}
+          {filters.subjects.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-gray-900 dark:text-gray-200 font-medium mb-2">
+                Select Topics (Click to select/deselect)
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {filters.subjects.flatMap(subject =>
+                  (topicsBySubject[subject] || []).map(topic => (
+                    <button
+                      key={topic}
+                      type="button"
+                      onClick={() => handleTopicToggle(topic)}
+                      className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.topics.includes(topic)
+                        ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
+                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                        } backdrop-blur-sm`}
+                    >
+                      {topic}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Mostrar filtros aplicados */}
+          {(filters.difficulty || filters.category || filters.subjects.length > 0 || filters.topics.length > 0) && (
+            <div className="mt-6">
+              <h4 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Applied Filters:</h4>
+              <div className="flex flex-wrap gap-2">
+                {filters.difficulty && (
+                  <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                    Difficulty: {filters.difficulty}
+                  </span>
+                )}
+                {filters.category && (
+                  <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                    Category: {filters.category}
+                  </span>
+                )}
+                {filters.subjects.map(subject => (
+                  <span key={subject} className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
+                    Subject: {subject}
+                  </span>
+                ))}
+                {filters.topics.map(topic => (
+                  <span key={topic} className="px-3 py-1 bg-green-600/30 dark:bg-green-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-green-500/40 dark:border-green-500/30">
+                    Topic: {topic}
+                  </span>
+                ))}
+                <button
+                  onClick={() => setFilters({ difficulty: '', category: '', subjects: [], topics: [] })}
+                  className="px-3 py-1 bg-red-600/30 dark:bg-red-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm hover:bg-red-700/40 dark:hover:bg-red-700/30 border border-red-500/40 dark:border-red-500/30"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20">
           <div className="bg-blue-600/90 dark:bg-blue-600/80 p-6 text-white flex justify-between items-center backdrop-blur-sm">
             <h2 className="text-2xl font-bold">Filter Questions</h2>
@@ -174,147 +345,17 @@ const AttemptedQuestionsPage = () => {
                     setQuestionStatusFilter(filter.value);
                     setPagination((prev) => ({ ...prev, current: 1 }));
                   }}
-                  className={`px-4 py-2 rounded-lg font-medium backdrop-blur-sm border border-white/40 dark:border-gray-700/30 ${
-                    questionStatusFilter === filter.value
-                      ? "bg-blue-600/90 dark:bg-blue-600/80 text-white"
-                      : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
-                  }`}
+                  className={`px-4 py-2 rounded-lg font-medium backdrop-blur-sm border border-white/40 dark:border-gray-700/30 ${questionStatusFilter === filter.value
+                    ? "bg-blue-600/90 dark:bg-blue-600/80 text-white"
+                    : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
+                    }`}
                 >
                   {filter.label}
                 </button>
               ))}
             </div>
 
-            <div className="mb-6">
-              <button
-                onClick={() => setFilterOpen(!filterOpen)}
-                className="flex items-center px-4 py-2 bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-gray-700/30"
-              >
-                {filterOpen ? "Hide Filters" : "More Filters"}
-                {filterOpen ? <ChevronUp className="ml-2" /> : <ChevronDown className="ml-2" />}
-              </button>
-              {filterOpen && (
-                <div className="mt-4 bg-white/30 dark:bg-black/20 rounded-lg p-6 backdrop-blur-sm border border-white/40 dark:border-gray-700/30">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Difficulty</h3>
-                      <select
-                        value={difficulty}
-                        onChange={(e) => {
-                          setDifficulty(e.target.value);
-                          setSelectedCategory("");
-                          setSelectedSubject("");
-                          setSelectedTopic("");
-                          setPagination((prev) => ({ ...prev, current: 1 }));
-                        }}
-                        className="w-full px-3 py-2 border border-white/40 dark:border-gray-700/30 rounded-md bg-white/30 dark:bg-black/10 backdrop-blur-sm text-gray-900 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                      >
-                        <option value="">Select Difficulty</option>
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                      </select>
-                    </div>
-                    {difficulty && (
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Category</h3>
-                        <select
-                          value={selectedCategory}
-                          onChange={(e) => {
-                            setSelectedCategory(e.target.value);
-                            setSelectedSubject("");
-                            setSelectedTopic("");
-                            setPagination((prev) => ({ ...prev, current: 1 }));
-                          }}
-                          className="w-full px-3 py-2 border border-white/40 dark:border-gray-700/30 rounded-md bg-white/30 dark:bg-black/10 backdrop-blur-sm text-gray-900 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        >
-                          <option value="">Select Category</option>
-                          {categories.map((cat) => (
-                            <option key={cat.name} value={cat.name}>
-                              {cat.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                    {selectedCategory && (
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Subject</h3>
-                        <select
-                          value={selectedSubject}
-                          onChange={(e) => {
-                            setSelectedSubject(e.target.value);
-                            setSelectedTopic("");
-                            setPagination((prev) => ({ ...prev, current: 1 }));
-                          }}
-                          className="w-full px-3 py-2 border border-white/40 dark:border-gray-700/30 rounded-md bg-white/30 dark:bg-black/10 backdrop-blur-sm text-gray-900 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        >
-                          <option value="">Select Subject</option>
-                          {(subjectsByCategory[selectedCategory] || []).map((subject) => (
-                            <option key={subject} value={subject}>
-                              {subject}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                    {selectedSubject && (
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Topic</h3>
-                        <select
-                          value={selectedTopic}
-                          onChange={(e) => {
-                            setSelectedTopic(e.target.value);
-                            setPagination((prev) => ({ ...prev, current: 1 }));
-                          }}
-                          className="w-full px-3 py-2 border border-white/40 dark:border-gray-700/30 rounded-md bg-white/30 dark:bg-black/10 backdrop-blur-sm text-gray-900 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        >
-                          <option value="">Select Topic</option>
-                          {(topicsBySubject[selectedSubject] || []).map((topic) => (
-                            <option key={topic} value={topic}>
-                              {topic}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                  </div>
-                  {(difficulty || selectedCategory || selectedSubject || selectedTopic) && (
-                    <div className="mt-4">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Selected Filters</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {difficulty && (
-                          <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
-                            Difficulty: {difficulty}
-                          </span>
-                        )}
-                        {selectedCategory && (
-                          <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
-                            Category: {selectedCategory}
-                          </span>
-                        )}
-                        {selectedSubject && (
-                          <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
-                            Subject: {selectedSubject}
-                          </span>
-                        )}
-                        {selectedTopic && (
-                          <span className="px-3 py-1 bg-blue-600/30 dark:bg-blue-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm border border-blue-500/40 dark:border-blue-500/30">
-                            Topic: {selectedTopic}
-                          </span>
-                        )}
-                        <button
-                          onClick={resetFilters}
-                          className="px-3 py-1 bg-red-600/30 dark:bg-red-600/20 text-gray-900 dark:text-gray-300 rounded-full text-sm hover:bg-red-700/40 dark:hover:bg-red-700/30 border border-red-500/40 dark:border-red-500/30"
-                        >
-                          Clear Filters
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+
           </div>
 
           <div className="p-6 relative">
@@ -381,15 +422,14 @@ const AttemptedQuestionsPage = () => {
                           {questionDetails[question._id]?.options?.map((option, oIndex) => (
                             <div
                               key={oIndex}
-                              className={`p-4 rounded-lg flex items-center space-x-4 backdrop-blur-sm ${
-                                question.selectedAnswer === oIndex && question.isCorrect
-                                  ? "bg-green-600/30 dark:bg-green-600/20 border border-green-500/40 dark:border-green-500/30"
-                                  : question.selectedAnswer === oIndex && !question.isCorrect
+                              className={`p-4 rounded-lg flex items-center space-x-4 backdrop-blur-sm ${question.selectedAnswer === oIndex && question.isCorrect
+                                ? "bg-green-600/30 dark:bg-green-600/20 border border-green-500/40 dark:border-green-500/30"
+                                : question.selectedAnswer === oIndex && !question.isCorrect
                                   ? "bg-red-600/30 dark:bg-red-600/20 border border-red-500/40 dark:border-red-500/30"
                                   : questionDetails[question._id]?.correctAnswer === oIndex
-                                  ? "bg-blue-600/30 dark:bg-blue-600/20 border border-blue-500/40 dark:border-blue-500/30"
-                                  : "bg-white/30 dark:bg-black/20 border border-white/40 dark:border-gray-700/30"
-                              }`}
+                                    ? "bg-blue-600/30 dark:bg-blue-600/20 border border-blue-500/40 dark:border-blue-500/30"
+                                    : "bg-white/30 dark:bg-black/20 border border-white/40 dark:border-gray-700/30"
+                                }`}
                             >
                               <div className="flex-shrink-0">
                                 {question.selectedAnswer === oIndex ? (
@@ -470,9 +510,9 @@ const AttemptedQuestionsPage = () => {
                         <div className="text-sm text-gray-700 dark:text-gray-300 mt-4">
                           <span>Category: {question.category || "N/A"}</span>
                           <span className="mx-2">•</span>
-                          <span>Subject: {question.subject || "N/A"}</span>
+                          <span>Subject: {question.subjects?.join(",") || "N/A"}</span>
                           <span className="mx-2">•</span>
-                          <span>Topic: {question.topic || "N/A"}</span>
+                          <span>Topic: {question.topics?.join(",") || "N/A"}</span>
                           <span className="mx-2">•</span>
                           <span>Difficulty: {question.difficulty || "N/A"}</span>
                         </div>
@@ -486,11 +526,10 @@ const AttemptedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current - 1)}
                         disabled={pagination.current === 1}
-                        className={`px-4 py-2 border text-base font-medium rounded-l-lg backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${
-                          pagination.current === 1
-                            ? "bg-white/20 dark:bg-black/20 text-gray-400 cursor-not-allowed"
-                            : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
-                        }`}
+                        className={`px-4 py-2 border text-base font-medium rounded-l-lg backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${pagination.current === 1
+                          ? "bg-white/20 dark:bg-black/20 text-gray-400 cursor-not-allowed"
+                          : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
+                          }`}
                       >
                         Previous
                       </button>
@@ -498,11 +537,10 @@ const AttemptedQuestionsPage = () => {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`px-5 py-2 border text-base font-medium backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${
-                            pagination.current === page
-                              ? "bg-blue-600/90 dark:bg-blue-600/80 text-white"
-                              : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
-                          }`}
+                          className={`px-5 py-2 border text-base font-medium backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${pagination.current === page
+                            ? "bg-blue-600/90 dark:bg-blue-600/80 text-white"
+                            : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
+                            }`}
                         >
                           {page}
                         </button>
@@ -510,11 +548,10 @@ const AttemptedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current + 1)}
                         disabled={pagination.current === pagination.pages}
-                        className={`px-4 py-2 border text-base font-medium rounded-r-lg backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${
-                          pagination.current === pagination.pages
-                            ? "bg-white/20 dark:bg-black/20 text-gray-400 cursor-not-allowed"
-                            : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
-                        }`}
+                        className={`px-4 py-2 border text-base font-medium rounded-r-lg backdrop-blur-sm border-white/40 dark:border-gray-700/30 ${pagination.current === pagination.pages
+                          ? "bg-white/20 dark:bg-black/20 text-gray-400 cursor-not-allowed"
+                          : "bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20"
+                          }`}
                       >
                         Next
                       </button>
