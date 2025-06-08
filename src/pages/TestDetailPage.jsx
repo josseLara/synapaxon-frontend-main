@@ -644,7 +644,7 @@ const OverallPerformanceView = () => {
                 </AnimatedDiv>
 
                 <div className="backdrop-blur-lgspace-y-8">
-                  <DataTable dataByCategory={dataByCategory} icon={Microscope} colorScheme="green" />
+                  {/* <DataTable dataByCategory={dataByCategory} icon={Microscope} colorScheme="green" /> */}
 
                   {/* Subject Performance Area Chart */}
                   <AnimatedDiv delay={1} className="mt-8">
