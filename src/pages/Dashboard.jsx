@@ -231,7 +231,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 relative z-10">
-        <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/30">
+        <div className="bg-white/60 dark:bg-black/40 rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700/30">
           {isDashboardRoot ? renderWelcome() : <Outlet />}
         </div>
       </main>

@@ -7,7 +7,6 @@ export const QuestionModal = ({ isOpen, onClose, category, type, count }) => {
     const [selectedCount, setSelectedCount] = useState(count);
     const [difficulty, setDifficulty] = useState([]);
     const [flagged, setFlagged] = useState(false);
-    
     if (!isOpen) return null;
     
     const difficultyOptions = [
@@ -27,7 +26,7 @@ export const QuestionModal = ({ isOpen, onClose, category, type, count }) => {
     return (  <>
     
       <div 
-        className="fixed inset-0  p-4 transition-opacity duration-300"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <div 

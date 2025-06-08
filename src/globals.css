@@ -57,3 +57,65 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Puedes agregar esto en tu archivo CSS global o usando un objeto de estilos */
+
+.category-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #93C5FD;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #374151;
+}
+
+.subject-item {
+  background-color: #1F2937;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.subject-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05), 0 0 20px rgba(96, 165, 250, 0.1);
+}
+
+.subject-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #E5E7EB;
+  display: flex;
+  align-items: center;
+}
+
+.subject-index {
+  color: #6B7280;
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.progress-bar-container {
+  height: 10px;
+  width: 100%;
+  background-color: #4B5563;
+  border-radius: 5px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  display: flex;
+}
+
+.progress-bar-right {
+  background: linear-gradient(to right, #22C55E, #16A34A);
+  height: 100%;
+  transition: width 0.8s ease-out;
+}
+
+.progress-bar-wrong {
+  background: linear-gradient(to right, #EF4444, #DC2626);
+  height: 100%;
+  transition: width 0.8s ease-out;
+}

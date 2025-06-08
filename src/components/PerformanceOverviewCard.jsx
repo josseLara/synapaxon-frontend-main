@@ -184,15 +184,33 @@ const PerformanceOverviewCard = ({
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => [`${value}%`, ""]}
-                    contentStyle={{
-                      backgroundColor: "var(--background)",
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                      color: "var(--foreground)",
+                    content={({ payload }) => {
+                      if (!payload || payload.length === 0) return null;
+
+                      const completed = payload.find(item => item.name === 'Completed')?.value || 0;
+                      const remaining = payload.find(item => item.name === 'Remaining')?.value || 0;
+                      const total = completed + remaining;
+
+                      return (
+                        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Progress Overview
+                          </div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Completed: {completed}% ({Math.round((completed / 100) * total)} items)
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Remaining: {remaining}% ({Math.round((remaining / 100) * total)} items)
+                            </span>
+                          </div>
+                        </div>
+                      );
                     }}
-                    itemStyle={{ color: "#ffffff" }} 
-                    labelStyle={{ color: "#2563eb" }} 
                   />
                   <Legend
                     verticalAlign="bottom"
@@ -245,15 +263,39 @@ const PerformanceOverviewCard = ({
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => [`${value}`, ""]}
-                    contentStyle={{
-                      backgroundColor: "var(--background)",
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                      color: "var(--foreground)",
+                    content={({ payload }) => {
+                      if (!payload || payload.length === 0) return null;
+
+                      const correct = payload.find(item => item.name === 'Correct')?.value || 0;
+                      const incorrect = payload.find(item => item.name === 'Incorrect')?.value || 0;
+                      const total = correct + incorrect;
+                      const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+                      return (
+                        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Accuracy: {accuracy}%
+                          </div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Correct: {correct} ({Math.round((correct / total) * 100)}%)
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              Incorrect: {incorrect} ({Math.round((incorrect / total) * 100)}%)
+                            </span>
+                          </div>
+                          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Total Attempts: {total}
+                            </span>
+                          </div>
+                        </div>
+                      );
                     }}
-                    itemStyle={{ color: "#ffffff" }} 
-                    labelStyle={{ color: "#2563eb" }} 
                   />
                   <Legend
                     verticalAlign="bottom"
