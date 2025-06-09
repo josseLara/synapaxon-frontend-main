@@ -56,8 +56,8 @@ return (
 key={pair.id}
 id={`collapsible-${pair.id}`}
 className={`rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all mb-5 mx-2 ${
-isCorrect ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200' :
-'bg-gradient-to-r from-red-50 to-red-100 border border-red-200'
+isCorrect ? 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl shadow-md border border-green-200 dark:border-green-700/30 hover:shadow-lg transition-all' :
+'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl shadow-md border border-red-200 dark:border-red-700/30 hover:shadow-lg transition-all'
 }`}
 >
 <div className="p-4">
@@ -72,7 +72,7 @@ isCorrect ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200
 </span>
 </div>
 <div className="flex flex-col md:flex-row md:items-center gap-3 mt-1">
-<div className="p-3 px-4 bg-white rounded-xl shadow-sm border-2 border-blue-100 flex-1 hover:shadow-md transition-all">
+<div className="p-3 px-4 bg-gray-300 rounded-xl shadow-sm border-2 border-blue-100 flex-1 hover:shadow-md transition-all">
 <div className="text-xs font-medium text-blue-500 mb-2 flex items-center">
 <Search className="h-3 w-3 mr-1" />
 Question
@@ -115,7 +115,7 @@ onClick={() => handleVideoClick(pair.id)}
 </div>
 </div>
 
-<div className="p-3 px-4 bg-white rounded-xl shadow-sm border-2 border-green-100 flex-1 hover:shadow-md transition-all">
+<div className="p-3 px-4 bg-gray-300 rounded-xl shadow-sm border-2 border-green-100 flex-1 hover:shadow-md transition-all">
 <div className="text-xs font-medium text-green-500 mb-2 flex items-center">
 <Star className="h-3 w-3 mr-1" />
 Answer
@@ -144,7 +144,7 @@ title="Practice again"
 </div>
 </div>
 
-<div className="flex items-center gap-2 mt-2 md:mt-0">
+<div className="flex items-center gap-2 mt-2 md:mt-0 justify-center ml-1">
 <div className={`px-3 py-1 rounded-full text-xs font-medium ${
 isCorrect
 ? 'bg-green-100 text-green-700 border border-green-200'

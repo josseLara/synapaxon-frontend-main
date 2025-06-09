@@ -310,7 +310,7 @@ export default function QuestionFilterPage() {
       fetchCounts()
       fetchQuestions()
     }
-  }, [questionStatusFilter, difficulty, selectedCategory])
+  }, [questionStatusFilter, difficulty, selectedCategory,selectedSubjects,selectedTopics])
 
   const toggleSubject = (subject) => {
     setSelectedSubjects((prev) => {

@@ -376,6 +376,8 @@ const TestRunnerPage = () => {
 
     setSubmitting(true);
     try {
+      let selectedFilters = testData.selectedFilters;
+      const topics = getPureTopicsArray(selectedFilters);
       // aqui corregido
       const submissionPromises = unsubmittedQuestions.map(async (question) => {
         const payload = {
@@ -384,7 +386,8 @@ const TestRunnerPage = () => {
           selectedAnswer: userAnswers.find(a => a.questionId === question._id)?.selectedAnswer ?? -1,
           timeTaken: 0,
           subjects: question.subjects?.map(s => s.name) || ['Unknown'],
-          topics: question.topics?.map(s => s.name) || ['Unknown'],
+          topics: topics || ['Unknown'],
+          difficulty:selectedFilters.difficulty
         };
 
         const submitResponse = await axios.post('/api/student-questions/submit', payload, {
@@ -451,6 +454,32 @@ const TestRunnerPage = () => {
       setSubmitting(false);
     }
   };
+
+  /**
+   * obtiene los topics de testData
+   */
+  function getPureTopicsArray(filter) {
+    try {
+      let topicsArray = [];
+
+      // Solo extraer los valores de topics (ignorar subjects)
+      if (filter.topics && typeof filter.topics === 'object' && !Array.isArray(filter.topics)) {
+        for (const subject in filter.topics) {
+          if (Array.isArray(filter.topics[subject])) {
+            topicsArray.push(...filter.topics[subject]); // Extrae solo los valores internos
+          }
+        }
+      }
+
+      // Eliminar duplicados (opcional)
+      topicsArray = [...new Set(topicsArray)];
+
+      return topicsArray;
+    } catch (error) {
+      console.error("Error al procesar los topics:", error);
+      return []; // Retorna array vacío en caso de error
+    }
+  }
 
   // Finalize test
   const finalizeTest = async () => {
@@ -1079,8 +1108,8 @@ const TestRunnerPage = () => {
                     onClick={handlePrevQuestion}
                     disabled={currentQuestionIndex === 0}
                     className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === 0
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                        : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                   >
                     <ChevronLeft size={16} className="mr-1" /> Previous
@@ -1089,8 +1118,8 @@ const TestRunnerPage = () => {
                     onClick={handleNextQuestion}
                     disabled={currentQuestionIndex === questions.length - 1}
                     className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === questions.length - 1
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                        : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                   >
                     Next <ChevronRight size={16} className="ml-1" />
@@ -1101,8 +1130,8 @@ const TestRunnerPage = () => {
                     onClick={() => handleSubmitQuestion()}
                     disabled={isQuestionSubmitted || submitting}
                     className={`px-6 py-2 rounded flex items-center ${isQuestionSubmitted || submitting
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
                       }`}
                   >
                     <Check size={16} className="mr-2" />

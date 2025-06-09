@@ -72,7 +72,6 @@ const OverallPerformanceView = () => {
         if (!token) {
           throw new Error("Authentication token not found")
         }
-        debugger
         // Fetch test session details
         const sessionResponse = await fetch(
           `${import.meta.env.VITE_API_URL || "https://synapaxon-backend.onrender.com"}/api/tests/${testId}`,
