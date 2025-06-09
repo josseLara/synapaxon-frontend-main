@@ -397,7 +397,7 @@ export default function LandingPage() {
               Features
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-              The Proven Choice
+              The Best Choice
             </h2>
             <h3 className="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
               For Efficient Medical Education
@@ -419,7 +419,7 @@ export default function LandingPage() {
               <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
                 <Brain className="h-6 w-6 text-blue-700 dark:text-blue-300" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+              {/* <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                 5.2K
               </div>
               <div className="flex items-center gap-1 mb-6">
@@ -427,7 +427,7 @@ export default function LandingPage() {
                 <span className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
                   medical questions
                 </span>
-              </div>
+              </div> */}
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
                 Comprehensive Question Bank
               </h3>
@@ -444,7 +444,7 @@ export default function LandingPage() {
               <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
                 <Users className="h-6 w-6 text-blue-700 dark:text-blue-300" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+              {/* <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                 12.8K
               </div>
               <div className="flex items-center gap-1 mb-6">
@@ -452,12 +452,12 @@ export default function LandingPage() {
                 <span className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
                   active students
                 </span>
-              </div>
+              </div> */}
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
                 Specialized Medical Interface
               </h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-                Designed specifically for medical professionals with precise terminology and intuitive navigation by specialties.
+                Designed specifically for medical students with precise terminology and intuitive navigation by specialties.
               </p>
             </motion.div>
 
@@ -469,16 +469,16 @@ export default function LandingPage() {
               <div className="bg-blue-100 dark:bg-blue-900/50 inline-block p-3 rounded-lg mb-6 transition-colors duration-300">
                 <TrendingUp className="h-6 w-6 text-blue-700 dark:text-blue-300" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+              {/* <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                 <div className="w-full h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
                   <span className="text-white text-lg font-bold">📈 +95%</span>
                 </div>
-              </div>
+              </div> */}
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
                 Guaranteed Progress
               </h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-                Our adaptive methodology adjusts to your knowledge level, from student to specialist, ensuring continuous improvement.
+                Since you are the one that knows your weakness and strength, you can adjust your content accordingly
               </p>
             </motion.div>
           </motion.div>
@@ -567,7 +567,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section
+      {/* <section
         id="testimonials"
         className="py-20 bg-gradient-to-b from-blue-900 to-blue-800 dark:from-blue-950 dark:to-blue-900 text-white transition-all duration-300"
       >
@@ -645,7 +645,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -827,7 +827,7 @@ export default function LandingPage() {
                 How does progress tracking work?
               </h3>
               <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                Our analytics system provides detailed reports of your performance by specialty, identifies improvement areas and gives personalized study recommendations.
+                Our analytics system provides detailed reports of your performance by specialty, but it is not a replacement for real evaluation exams.
               </p>
             </motion.div>
           </div>
@@ -849,7 +849,7 @@ export default function LandingPage() {
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Start Mastering Medicine Today</h2>
             <p className="text-blue-200 text-lg mb-8">
-              Join thousands of medical students and professionals who have transformed their learning with Synapaxon. Start free, no commitments.
+               Free, no commitments.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

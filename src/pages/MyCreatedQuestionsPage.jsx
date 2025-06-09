@@ -233,7 +233,7 @@ const MyCreatedQuestionsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-8">
+    <div className="min-h-screen py-12 px-8">
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-lg p-6 max-w-md mx-auto border border-white/40 dark:border-gray-800/20">
@@ -362,7 +362,7 @@ const MyCreatedQuestionsPage = () => {
 
           {/* Sección de Filtros */}
           {/* Sección de Filtros */}
-          <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
+          <div className="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
             <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
 
             {/* Filtro de dificultad */}

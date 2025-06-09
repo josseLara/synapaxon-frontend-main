@@ -508,7 +508,7 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-blue-200/30 dark:border-gray-700/30">
           {/* Header */}

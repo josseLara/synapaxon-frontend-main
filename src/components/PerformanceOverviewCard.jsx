@@ -155,7 +155,7 @@ const PerformanceOverviewCard = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className=" backdrop-blur-lg rounded-2xl p-6 shadow-xl  border-gray-200/50 hover:shadow-2xl transition-all"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl  border-gray-200/50 hover:shadow-2xl transition-all"
           >
             <h4 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-4 flex items-center">
               <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-full p-1.5 mr-2 shadow-inner">
@@ -234,7 +234,7 @@ const PerformanceOverviewCard = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className=" backdrop-blur-lg rounded-2xl p-6 shadow-xl border-gray-200/50 hover:shadow-2xl transition-all"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border-gray-200/50 hover:shadow-2xl transition-all"
           >
             <h4 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-4 flex items-center">
               <span className="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-300 rounded-full p-1.5 mr-2 shadow-inner">

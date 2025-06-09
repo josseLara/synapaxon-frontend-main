@@ -127,7 +127,7 @@ function Login() {
           ))}
         </div>
 
-        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
+        <div className="relative z-10 flex flex-col justify-center px-11 text-white">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
             <div className="flex items-center mb-8">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
@@ -141,12 +141,12 @@ function Login() {
               <span className="block text-blue-200">Interactive Learning</span>
             </h1>
 
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+            {/* <p className="text-xl text-blue-100 mb-8 leading-relaxed">
               Join thousands of medical students and professionals advancing their careers through our comprehensive
               quiz platform.
-            </p>
+            </p> */}
 
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               {[
                 "Ciencias Básicas - Anatomía, Fisiología, Bioquímica",
                 "Sistemas de Órganos - Cardiovascular, Respiratorio, Nervioso",
@@ -163,7 +163,7 @@ function Login() {
                   <span className="text-blue-100">{feature}</span>
                 </motion.div>
               ))}
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </div>

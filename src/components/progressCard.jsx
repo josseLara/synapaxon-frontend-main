@@ -14,7 +14,7 @@ const SubjectItem = ({ index, name, correct = 0, incorrect = 0, total = 0, highl
 
   return (
     <div
-      className={`subject-item bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-750 border ${
+      className={`subject-item bg-white dark:bg-gray-800 rounded-lg h-fit p-4 mb-4 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-750 border ${
         highlighted 
           ? 'border-blue-200 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-900/20' 
           : 'border-gray-200 dark:border-gray-700'

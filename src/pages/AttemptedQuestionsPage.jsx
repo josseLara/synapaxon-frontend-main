@@ -182,7 +182,7 @@ const AttemptedQuestionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-8">
+    <div className="min-h-screen py-12 px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200">My Attempted Questions</h1>
@@ -196,7 +196,7 @@ const AttemptedQuestionsPage = () => {
         </div>
 
         {/* Sección de Filtros */}
-        <div className="mb-8 bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
+        <div className="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20 p-6">
           <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">Filter Questions</h2>
 
           {/* Filtro de dificultad */}

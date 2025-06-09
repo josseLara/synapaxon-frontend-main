@@ -356,7 +356,7 @@ const OverallPerformanceView = () => {
   }
 
   return (
-    <>
+    <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl shadow-xl border border-blue-200/30 dark:border-gray-700/30 p-6 rounded-lg shadow-md">
       <TooltipProvider>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="px-4">
@@ -384,9 +384,9 @@ const OverallPerformanceView = () => {
               }
             />
 
-            <FilterSection activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+            {/* <FilterSection activeFilter={activeFilter} setActiveFilter={setActiveFilter} /> */}
 
-            <QuestionList
+            {/* <QuestionList
               testPairs={questions.map((item) => ({
                 id: item._id,
                 term1: item.question.questionText,
@@ -410,7 +410,7 @@ const OverallPerformanceView = () => {
                 })),
               }}
               activeFilter={activeFilter}
-            />
+            /> */}
           </TabsContent>
 
           <TabsContent value="overall-overview" className="border-none">
@@ -421,7 +421,7 @@ const OverallPerformanceView = () => {
                     <div className="flex flex-col gap-4">
                       <AnimatedDiv
                         delay={1}
-                        className=" backdrop-blur-lg rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300"
+                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300"
                       >
                         <h3 className="text-center text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-center">
                           <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
@@ -527,7 +527,7 @@ const OverallPerformanceView = () => {
                     <div className="flex flex-col gap-4">
                       <AnimatedDiv
                         delay={1}
-                        className=" backdrop-blur-lg rounded-2xl p-6 shadow-xl border-gray-200/50 hover:shadow-2xl transition-all duration-300"
+                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border-gray-200/50 hover:shadow-2xl transition-all duration-300"
                       >
                         <h3 className="text-center text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-center">
                           <Database className="h-5 w-5 mr-2 text-blue-500" />
@@ -663,7 +663,7 @@ const OverallPerformanceView = () => {
         </Tabs>
       </TooltipProvider>
 
-    </>
+    </div>
   )
 }
 

@@ -417,7 +417,7 @@ export default function QuestionFilterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+    <div className="min-h-screen ">
       {/* Error Message */}
       {errorMessage && (
         <div className="mx-4 mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 p-4 rounded-xl shadow-md">
