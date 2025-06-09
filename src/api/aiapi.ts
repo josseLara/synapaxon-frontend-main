@@ -5,7 +5,7 @@ import axios from 'axios';
 // In development, this might be http://localhost:8000
 // In production, this will be the URL where your FastAPI AI service is deployed.
 // It's good practice to use environment variables for this.
-const AI_BACKEND_URL = 'http://localhost:3000';
+const AI_BACKEND_URL = 'https://tense-christy-ujjwal0704-a552bc8a.koyeb.app';
 
 const aiApiClient = axios.create({
   baseURL: AI_BACKEND_URL,
@@ -94,30 +94,21 @@ export const generateQuestionsFromTextAI = async (
       literal_mode: literalMode || false,
     };
 
-    const token = localStorage.getItem('token'); // Get JWT token
     const response = await aiApiClient.post<AIGenerateQuestionsResponse>(
-      '/api/ai/generate-questions-from-text',
-      payload,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
-      }
+      '/api/ai/generate-questions-from-text', // New endpoint
+      payload
+      // No need for 'multipart/form-data' here, default is 'application/json'
+      // Add Authorization header if this endpoint also needs it (see previous comments)
     );
     return response.data;
   } catch (error) {
     console.error('Error generating questions from text via AI:', error);
     if (axios.isAxiosError(error) && error.response) {
-      return (
-        (error.response.data as AIGenerateQuestionsResponse) || {
-          success: false,
-          data: null,
-          message:
-            error.response.data?.detail ||
-            error.response.data?.message ||
-            'An unexpected error occurred with the AI service.',
-        }
-      );
+      return error.response.data as AIGenerateQuestionsResponse || {
+        success: false,
+        data: null,
+        message: error.response.data?.detail || error.response.data?.message || 'An unexpected error occurred with the AI service.',
+      };
     }
     return {
       success: false,
