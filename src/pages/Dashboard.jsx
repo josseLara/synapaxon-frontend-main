@@ -6,6 +6,7 @@ import { Clock, Edit, BookOpen, CheckCircle, FileText } from "lucide-react"
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, Outlet, useLocation } from 'react-router-dom'
 import Header from "../components/header"
+import AIChatBot from "./AIChatBot"
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth()
@@ -234,6 +235,7 @@ export default function Dashboard() {
         <div className="">
           {isDashboardRoot ? renderWelcome() : <Outlet />}
         </div>
+      <AIChatBot />
       </main>
     </div>
   )

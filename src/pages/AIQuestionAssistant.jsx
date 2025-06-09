@@ -836,7 +836,7 @@ const AIQuestionAssistant = () => {
     return (
       <div className="my-2 flex items-center justify-center space-x-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
         <span className={`text-sm font-medium ${!isLiteralMode ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
-          AI Generates
+          Generate questions
         </span>
         <button
           onClick={() => setIsLiteralMode(!isLiteralMode)}
@@ -851,7 +851,7 @@ const AIQuestionAssistant = () => {
           />
         </button>
         <span className={`text-sm font-medium ${isLiteralMode ? 'text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>
-          AI Parses Literally
+          Data entry
         </span>
       </div>
     );
@@ -873,7 +873,7 @@ const AIQuestionAssistant = () => {
       </div>
 
       {/* AI Mode Toggle */}
-      {renderModeToggle()} 
+      {/* {renderModeToggle()}  */}
        
       {/* Literal Toggle */}
       {renderLiteralModeToggle()}
