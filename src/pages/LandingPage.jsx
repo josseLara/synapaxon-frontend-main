@@ -13,6 +13,9 @@ import {
   TrendingUp,
   SunIcon,
   MoonIcon,
+  Rocket,
+  Zap,
+  Crown,
 } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { motion } from "framer-motion"
@@ -23,7 +26,7 @@ import { useNavigate } from "react-router-dom"
 export default function LandingPage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [isDarkMode, setIsDarkMode] = useState(false)
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
@@ -85,29 +88,35 @@ export default function LandingPage() {
   const subscriptionsData = [
     {
       id: 1,
-      name: "Student",
+      name: "Free",
       price: 0,
-      description: "Ideal for medical students",
-      maxUsers: 1,
-      maxQuestions: 100,
+      description: "Ideal for getting started",
+      maxQuestions: 5,
+      maxChats: 5,
+      maxAgents: 5,
+      daysFree: 5,
     },
     {
       id: 2,
-      name: "Professional",
+      name: "Pro",
       price: 9,
-      description: "For residents and specialists",
-      maxUsers: 1,
-      maxQuestions: 1000,
+      description: "For regular users",
+      maxQuestions: 50,
+      maxChats: 50,
+      maxAgents: 20,
+      daysFree: 0,
     },
     {
       id: 3,
-      name: "Institutional",
+      name: "Premium",
       price: 29,
-      description: "For universities and hospitals",
-      maxUsers: 50,
+      description: "For power users",
       maxQuestions: "Unlimited",
+      maxChats: 100,
+      maxAgents: 50,
+      daysFree: 0,
     },
-  ]
+  ];
 
   const container = {
     hidden: { opacity: 0 },
@@ -330,7 +339,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
                 {/* <span className="text-blue-200 text-sm">Diagnostic Accuracy</span> */}
-               <div className="text-white text-3xl font-bold">Create your own questions</div>
+                <div className="text-white text-3xl font-bold">Create your own questions</div>
               </div>
               {/* <div className="text-white text-3xl font-bold">98.5%</div>
               <div className="flex items-center gap-1 mt-1">
@@ -347,7 +356,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
                 {/* <span className="text-blue-200 text-sm">Select your test</span> */}
-               <div className="text-white text-3xl font-bold">Select your test</div>
+                <div className="text-white text-3xl font-bold">Select your test</div>
               </div>
               {/* <div className="text-white text-3xl font-bold">40%</div>
               <div className="flex items-center gap-1 mt-1">
@@ -364,7 +373,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
                 {/* <span className="text-blue-200 text-sm">get feedback</span> */}
-               <div className="text-white text-3xl font-bold">Get feedback</div>
+                <div className="text-white text-3xl font-bold">Get feedback</div>
               </div>
               {/*<div className="flex items-center gap-1 mt-1">
                 <span className="text-blue-200 text-xs">↑ 60%</span>
@@ -675,21 +684,21 @@ export default function LandingPage() {
             {subscriptionsData.map((sub) => (
               <Card
                 key={sub.id}
-                className={`relative flex flex-col justify-between cursor-pointer transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-800 ${sub.name.toLowerCase() === "professional"
-                    ? "border-blue-500 ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900 shadow-lg shadow-blue-500/10"
-                    : "border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800"
+                className={`relative flex flex-col justify-between cursor-pointer transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-800 ${sub.name.toLowerCase() === "pro"
+                  ? "border-blue-500 ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900 shadow-lg shadow-blue-500/10"
+                  : "border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800"
                   }`}
               >
-                {sub.name.toLowerCase() === "professional" && (
+                {sub.name.toLowerCase() === "pro" && (
                   <div className="absolute -right-1 -top-1 rounded-bl-md rounded-tr-md bg-blue-500 px-3 py-1 text-xs font-medium text-white shadow-md">
                     Recommended
                   </div>
                 )}
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-xl text-gray-900 dark:text-white transition-colors duration-300">
-                    {sub.name.toLowerCase() === "student" ? (
+                    {sub.name.toLowerCase() === "free" ? (
                       <GraduationCap className="h-6 w-6 text-blue-500" />
-                    ) : sub.name.toLowerCase() === "professional" ? (
+                    ) : sub.name.toLowerCase() === "pro" ? (
                       <Stethoscope className="h-6 w-6 text-blue-500" />
                     ) : (
                       <Award className="h-6 w-6 text-blue-500" />
@@ -702,7 +711,17 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-6 text-4xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
-                    ${sub.price} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">USD/month</span>
+                    {sub.price === 0 ? "Free" : `$${sub.price}`}{" "}
+                    {sub.price > 0 && (
+                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        USD/month
+                      </span>
+                    )}
+                    {sub.daysFree > 0 && (
+                      <div className="text-sm font-normal text-green-500">
+                        {sub.daysFree} days free access
+                      </div>
+                    )}
                   </div>
                   <ul className="space-y-3">
                     <li className="flex items-center gap-3">
@@ -710,7 +729,7 @@ export default function LandingPage() {
                         <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
-                        Up to {sub.maxUsers} user{sub.maxUsers > 1 ? "s" : ""}
+                        Upload up to {sub.maxQuestions === "Unlimited" ? "unlimited" : sub.maxQuestions} questions per day
                       </span>
                     </li>
                     <li className="flex items-center gap-3">
@@ -718,7 +737,7 @@ export default function LandingPage() {
                         <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
-                        {sub.maxQuestions} questions
+                        Use AI chat up to {sub.maxChats} times per day
                       </span>
                     </li>
                     <li className="flex items-center gap-3">
@@ -726,24 +745,20 @@ export default function LandingPage() {
                         <Check className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <span className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
-                        {sub.name.toLowerCase() === "student"
-                          ? "Email support"
-                          : sub.name.toLowerCase() === "professional"
-                            ? "Priority support"
-                            : "24/7 dedicated support"}
+                        Use agent up to {sub.maxAgents} times per day
                       </span>
                     </li>
                   </ul>
                 </CardContent>
                 <CardFooter className="pt-4">
                   <Button
-                    className={`w-full h-11 transition-all duration-300 ${sub.name.toLowerCase() === "professional"
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
-                        : "border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 bg-transparent border"
+                    className={`w-full h-11 transition-all duration-300 ${sub.name.toLowerCase() === "pro"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 bg-transparent border"
                       }`}
                     onClick={() => handleNavigation("/register")}
                   >
-                    Select
+                    {sub.price === 0 ? "Get Started" : "Select"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -852,7 +867,7 @@ export default function LandingPage() {
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Start Mastering Medicine Today</h2>
             <p className="text-blue-200 text-lg mb-8">
-               Free, no commitments.
+              Free, no commitments.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
