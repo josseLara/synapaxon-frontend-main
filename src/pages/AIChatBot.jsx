@@ -124,7 +124,7 @@ const AIChatBot = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed z-[1000] bottom-16 right-4 w-[550px] h-[80vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col"
+          className="fixed z-[1000] bottom-16 right-4 w-[550px] h-[70vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col"
         >
           <motion.div
             initial={{ opacity: 0, y: -10 }}
