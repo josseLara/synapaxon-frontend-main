@@ -5,6 +5,7 @@ import { Menu, Clock, Flag, Check, ChevronLeft, ChevronRight, X, PlayCircle, Pau
 import MediaDisplay from './MediaDisplay';
 import Calculator from './Calculator';
 import LabValuesModal from './LabValuesModal';
+import Preloader from '../components/Preloader';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -387,7 +388,7 @@ const TestRunnerPage = () => {
           timeTaken: 0,
           subjects: question.subjects?.map(s => s.name) || ['Unknown'],
           topics: topics || ['Unknown'],
-          difficulty:selectedFilters.difficulty
+          difficulty: selectedFilters.difficulty
         };
 
         const submitResponse = await axios.post('/api/student-questions/submit', payload, {
@@ -720,7 +721,9 @@ const TestRunnerPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center p-8 max-w-md mx-auto">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 dark:border-blue-400 mx-auto mb-4"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading your test...</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Please wait while we prepare your questions.</p>
         </div>

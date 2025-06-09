@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-const Preloader = () => {
+const Preloader = ({ left = 0 }) => {
   const preloaderStyle = {
     position: 'fixed',
     top: 0,
-    left: 0,
+    left: left,
     height: '100vh',
     width: '100vw',
-    backgroundColor: '#131b2a',
+    backgroundColor: "#131b2a",
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { Menu, Clock, Flag, Check, ChevronLeft, ChevronRight, X, PlayCircle, PauseCircle } from 'lucide-react';
 import MediaDisplay from './MediaDisplay';
+import Preloader from '../components/Preloader';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -619,7 +620,9 @@ const TestRunnerPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center p-8 max-w-md mx-auto">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <h2 className="text-xl font-semibold text-gray-700">Loading your test...</h2>
           <p className="text-gray-500 mt-2">Please wait while we prepare your questions.</p>
         </div>
@@ -657,9 +660,8 @@ const TestRunnerPage = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-[7.5%] bg-white shadow-lg transform transition-transform ${
-          showSidebar ? 'translate-x-0' : '-translate-x-full'
-        } z-20 overflow-y-auto`}
+        className={`fixed inset-y-0 left-0 w-[7.5%] bg-white shadow-lg transform transition-transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+          } z-20 overflow-y-auto`}
       >
         <div className="flex justify-between items-center p-2 border-b">
           <h2 className="text-sm font-bold">Questions</h2>
@@ -840,11 +842,11 @@ const TestRunnerPage = () => {
                   <h2 className="text-xl font-semibold">
                     {currentQuestion?.questionText
                       ? renderHighlightedText(
-                          typeof currentQuestion.questionText === 'object'
-                            ? currentQuestion.questionText.text
-                            : currentQuestion.questionText,
-                          currentQuestion._id
-                        )
+                        typeof currentQuestion.questionText === 'object'
+                          ? currentQuestion.questionText.text
+                          : currentQuestion.questionText,
+                        currentQuestion._id
+                      )
                       : 'No question text'}
                   </h2>
                 </div>
@@ -867,9 +869,8 @@ const TestRunnerPage = () => {
                       <div key={index} className="flex items-center p-4 border rounded-lg">
                         <button
                           onClick={() => !isQuestionSubmitted && handleAnswerSelect(index)}
-                          className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center ${
-                            isSelected ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-                          } ${isQuestionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                          className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center ${isSelected ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                            } ${isQuestionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                           disabled={isQuestionSubmitted}
                           aria-label={`Select option ${String.fromCharCode(65 + index)}`}
                         >
@@ -890,9 +891,9 @@ const TestRunnerPage = () => {
                           >
                             {option?.text
                               ? renderHighlightedText(
-                                  typeof option === 'object' ? option.text : option,
-                                  currentQuestion._id
-                                )
+                                typeof option === 'object' ? option.text : option,
+                                currentQuestion._id
+                              )
                               : 'No option text'}
                           </span>
                           {/* Option Media */}
@@ -917,22 +918,20 @@ const TestRunnerPage = () => {
                   <button
                     onClick={handlePrevQuestion}
                     disabled={currentQuestionIndex === 0}
-                    className={`px-4 py-2 rounded flex items-center ${
-                      currentQuestionIndex === 0
+                    className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === 0
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <ChevronLeft size={16} className="mr-1" /> Previous
                   </button>
                   <button
                     onClick={handleNextQuestion}
                     disabled={currentQuestionIndex === questions.length - 1}
-                    className={`px-4 py-2 rounded flex items-center ${
-                      currentQuestionIndex === questions.length - 1
+                    className={`px-4 py-2 rounded flex items-center ${currentQuestionIndex === questions.length - 1
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     Next <ChevronRight size={16} className="ml-1" />
                   </button>
@@ -941,11 +940,10 @@ const TestRunnerPage = () => {
                   <button
                     onClick={() => handleSubmitQuestion()}
                     disabled={isQuestionSubmitted || submitting}
-                    className={`px-6 py-2 rounded flex items-center ${
-                      isQuestionSubmitted || submitting
+                    className={`px-6 py-2 rounded flex items-center ${isQuestionSubmitted || submitting
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                      }`}
                   >
                     <Check size={16} className="mr-2" />
                     {submitting ? 'Submitting...' : isQuestionSubmitted ? 'Submitted' : 'Submit Question'}

@@ -8,6 +8,7 @@ import {
   Video,
 } from "lucide-react";
 import MediaDisplay from "./MediaDisplay";
+import Preloader from "../components/Preloader";
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -175,13 +176,13 @@ const TestDetailPage = () => {
             ).length,
             avgTimePerQuestion: sessionData.data.completedAt
               ? (() => {
-                  const start = new Date(sessionData.data.startedAt);
-                  const end = new Date(sessionData.data.completedAt);
-                  const totalSeconds = (end - start) / 1000;
-                  return sessionData.data.totalQuestions > 0
-                    ? Math.round(totalSeconds / sessionData.data.totalQuestions)
-                    : 0;
-                })()
+                const start = new Date(sessionData.data.startedAt);
+                const end = new Date(sessionData.data.completedAt);
+                const totalSeconds = (end - start) / 1000;
+                return sessionData.data.totalQuestions > 0
+                  ? Math.round(totalSeconds / sessionData.data.totalQuestions)
+                  : 0;
+              })()
               : "N/A",
           };
 
@@ -303,8 +304,8 @@ const TestDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600"></div>
+      <div className="w-full">
+        <Preloader left="-10%" />
       </div>
     );
   }
@@ -424,19 +425,18 @@ const TestDetailPage = () => {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Status</span>
                             <span
-                              className={`font-medium ${
-                                testDetail.status === "succeeded"
+                              className={`font-medium ${testDetail.status === "succeeded"
                                   ? "text-green-600"
                                   : testDetail.status === "canceled"
-                                  ? "text-red-600"
-                                  : "text-yellow-600"
-                              }`}
+                                    ? "text-red-600"
+                                    : "text-yellow-600"
+                                }`}
                             >
                               {testDetail.status === "succeeded"
                                 ? "Completed"
                                 : testDetail.status === "canceled"
-                                ? "Canceled"
-                                : "In Progress"}
+                                  ? "Canceled"
+                                  : "In Progress"}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -473,13 +473,12 @@ const TestDetailPage = () => {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Percentage</span>
                             <span
-                              className={`font-medium ${
-                                testDetail.scorePercentage >= 70
+                              className={`font-medium ${testDetail.scorePercentage >= 70
                                   ? "text-green-600"
                                   : testDetail.scorePercentage >= 40
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
-                              }`}
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                                }`}
                             >
                               {testDetail.scorePercentage}%
                             </span>
@@ -491,13 +490,12 @@ const TestDetailPage = () => {
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-3">
                               <div
-                                className={`h-3 rounded-full ${
-                                  testDetail.scorePercentage >= 70
+                                className={`h-3 rounded-full ${testDetail.scorePercentage >= 70
                                     ? "bg-green-500"
                                     : testDetail.scorePercentage >= 40
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
-                                }`}
+                                      ? "bg-yellow-500"
+                                      : "bg-red-500"
+                                  }`}
                                 style={{
                                   width: `${testDetail.scorePercentage}%`,
                                 }}
@@ -648,7 +646,7 @@ const TestDetailPage = () => {
                           </span>
                           <span className="font-medium text-gray-900">
                             {analytics.questionStats?.avgTimePerQuestion ===
-                            "N/A"
+                              "N/A"
                               ? "N/A"
                               : `${analytics.questionStats.avgTimePerQuestion}s`}
                           </span>
@@ -707,19 +705,19 @@ const TestDetailPage = () => {
                           {/* Question Media */}
                           {questionDetails[question._id]?.questionMedia
                             ?.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {questionDetails[question._id].questionMedia.map(
-                                (media, index) => (
-                                  <ErrorBoundary key={index}>
-                                    <MediaDisplay
-                                      media={media}
-                                      label={`Question Media ${index + 1}`}
-                                    />
-                                  </ErrorBoundary>
-                                )
-                              )}
-                            </div>
-                          )}
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {questionDetails[question._id].questionMedia.map(
+                                  (media, index) => (
+                                    <ErrorBoundary key={index}>
+                                      <MediaDisplay
+                                        media={media}
+                                        label={`Question Media ${index + 1}`}
+                                      />
+                                    </ErrorBoundary>
+                                  )
+                                )}
+                              </div>
+                            )}
                         </div>
                         {expandedQuestions[question._id] ? (
                           <ChevronUp className="w-6 h-6 text-gray-600" />
@@ -733,26 +731,24 @@ const TestDetailPage = () => {
                             {question.options?.map((option, oIndex) => (
                               <div
                                 key={oIndex}
-                                className={`p-4 rounded-lg flex items-center space-x-4 ${
-                                  question.selectedAnswer === oIndex &&
-                                  question.isCorrect
+                                className={`p-4 rounded-lg flex items-center space-x-4 ${question.selectedAnswer === oIndex &&
+                                    question.isCorrect
                                     ? "bg-green-50 border border-green-200"
                                     : question.selectedAnswer === oIndex &&
                                       !question.isCorrect
-                                    ? "bg-red-50 border border-red-200"
-                                    : question.correctAnswer === oIndex
-                                    ? "bg-blue-50 border border-blue-200"
-                                    : "bg-gray-50 border border-gray-200"
-                                }`}
+                                      ? "bg-red-50 border border-red-200"
+                                      : question.correctAnswer === oIndex
+                                        ? "bg-blue-50 border border-blue-200"
+                                        : "bg-gray-50 border border-gray-200"
+                                  }`}
                               >
                                 <div className="flex-shrink-0">
                                   {question.selectedAnswer === oIndex ? (
                                     <svg
-                                      className={`w-6 h-6 ${
-                                        question.isCorrect
+                                      className={`w-6 h-6 ${question.isCorrect
                                           ? "text-green-500"
                                           : "text-red-500"
-                                      }`}
+                                        }`}
                                       fill="currentColor"
                                       viewBox="0 0 20 20"
                                     >
@@ -795,21 +791,21 @@ const TestDetailPage = () => {
                                   {questionDetails[question._id]?.options?.[
                                     oIndex
                                   ]?.media?.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                      {questionDetails[question._id].options[
-                                        oIndex
-                                      ].media.map((media, mediaIndex) => (
-                                        <ErrorBoundary key={mediaIndex}>
-                                          <MediaDisplay
-                                            media={media}
-                                            label={`Option ${String.fromCharCode(
-                                              65 + oIndex
-                                            )} Media ${mediaIndex + 1}`}
-                                          />
-                                        </ErrorBoundary>
-                                      ))}
-                                    </div>
-                                  )}
+                                      <div className="mt-2 flex flex-wrap gap-2">
+                                        {questionDetails[question._id].options[
+                                          oIndex
+                                        ].media.map((media, mediaIndex) => (
+                                          <ErrorBoundary key={mediaIndex}>
+                                            <MediaDisplay
+                                              media={media}
+                                              label={`Option ${String.fromCharCode(
+                                                65 + oIndex
+                                              )} Media ${mediaIndex + 1}`}
+                                            />
+                                          </ErrorBoundary>
+                                        ))}
+                                      </div>
+                                    )}
                                 </div>
                               </div>
                             ))}
@@ -856,19 +852,19 @@ const TestDetailPage = () => {
                             {/* Explanation Media */}
                             {questionDetails[question._id]?.explanationMedia
                               ?.length > 0 && (
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {questionDetails[
-                                  question._id
-                                ].explanationMedia.map((media, index) => (
-                                  <ErrorBoundary key={index}>
-                                    <MediaDisplay
-                                      media={media}
-                                      label={`Explanation Media ${index + 1}`}
-                                    />
-                                  </ErrorBoundary>
-                                ))}
-                              </div>
-                            )}
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {questionDetails[
+                                    question._id
+                                  ].explanationMedia.map((media, index) => (
+                                    <ErrorBoundary key={index}>
+                                      <MediaDisplay
+                                        media={media}
+                                        label={`Explanation Media ${index + 1}`}
+                                      />
+                                    </ErrorBoundary>
+                                  ))}
+                                </div>
+                              )}
                           </div>
 
                           <div className="text-sm text-gray-500 mt-4">
@@ -893,13 +889,11 @@ const TestDetailPage = () => {
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-5 py-2 border text-base font-medium ${
-                              pagination.current === page
+                            className={`px-5 py-2 border text-base font-medium ${pagination.current === page
                                 ? "bg-indigo-600 text-white border-indigo-600"
                                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                            } ${page === 1 ? "rounded-l-lg" : ""} ${
-                              page === pagination.pages ? "rounded-r-lg" : ""
-                            }`}
+                              } ${page === 1 ? "rounded-l-lg" : ""} ${page === pagination.pages ? "rounded-r-lg" : ""
+                              }`}
                           >
                             {page}
                           </button>

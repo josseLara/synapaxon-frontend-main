@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp, Image as ImageIcon, Edit, Trash2, ArrowLeft } from "lucide-react";
 import MediaDisplay from "./MediaDisplay";
+import Preloader from "../../../src/components/Preloader";
 
 const MyCreatedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -143,7 +144,9 @@ const MyCreatedQuestionsPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 mb-4 mx-auto"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <div className="text-gray-600 text-lg font-medium">
             Loading your created questions...
           </div>
@@ -260,11 +263,10 @@ const MyCreatedQuestionsPage = () => {
                           {question.options?.map((option, oIndex) => (
                             <div
                               key={oIndex}
-                              className={`p-4 rounded-lg flex items-center space-x-4 ${
-                                question.correctAnswer === oIndex
+                              className={`p-4 rounded-lg flex items-center space-x-4 ${question.correctAnswer === oIndex
                                   ? "bg-blue-50 border border-blue-200"
                                   : "bg-gray-50 border border-gray-200"
-                              }`}
+                                }`}
                             >
                               <div className="flex-shrink-0">
                                 {question.correctAnswer === oIndex ? (
@@ -384,11 +386,10 @@ const MyCreatedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current - 1)}
                         disabled={pagination.current === 1}
-                        className={`px-4 py-2 border text-base font-medium rounded-l-lg ${
-                          pagination.current === 1
+                        className={`px-4 py-2 border text-base font-medium rounded-l-lg ${pagination.current === 1
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         Previous
                       </button>
@@ -396,11 +397,10 @@ const MyCreatedQuestionsPage = () => {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`px-5 py-2 border text-base font-medium ${
-                            pagination.current === page
+                          className={`px-5 py-2 border text-base font-medium ${pagination.current === page
                               ? "bg-indigo-600 text-white border-indigo-600"
                               : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -408,11 +408,10 @@ const MyCreatedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current + 1)}
                         disabled={pagination.current === pagination.pages}
-                        className={`px-4 py-2 border text-base font-medium rounded-r-lg ${
-                          pagination.current === pagination.pages
+                        className={`px-4 py-2 border text-base font-medium rounded-r-lg ${pagination.current === pagination.pages
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         Next
                       </button>

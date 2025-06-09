@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Image as ImageIcon, ArrowLeft } from "lucide-re
 import MediaDisplay from "./MediaDisplay";
 import { categories, subjectsByCategory, topicsBySubject } from "../data/questionData";
 import axios from '../api/axiosConfig';
+import Preloader from "../components/Preloader";
 
 const AttemptedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -147,10 +148,10 @@ const AttemptedQuestionsPage = () => {
     }
   };
 
-useEffect(() => {
-  fetchCounts();
-  fetchQuestions();
-}, [questionStatusFilter, filters, pagination.current]); // Usar filters como dependencia
+  useEffect(() => {
+    fetchCounts();
+    fetchQuestions();
+  }, [questionStatusFilter, filters, pagination.current]); // Usar filters como dependencia
 
   const filteredQuestions = useMemo(() => questions, [questions]);
 
@@ -324,7 +325,7 @@ useEffect(() => {
           )}
         </div>
 
-        <div className="bg-white/20 dark:bg-black/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20">
+        <div className="bg-white dark:bg-gray-800 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-gray-800/20">
           <div className="bg-blue-600/90 dark:bg-blue-600/80 p-6 text-white flex justify-between items-center backdrop-blur-sm">
             <h2 className="text-2xl font-bold">Filter Questions</h2>
             <div className="text-base font-semibold">
@@ -360,9 +361,9 @@ useEffect(() => {
 
           <div className="p-6 relative">
             {loading && (
-              <div className="absolute inset-0 flex justify-center items-center bg-white/20 dark:bg-black/20 backdrop-blur-sm z-10">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 dark:border-blue-400"></div>
-              </div>
+                <div className="w-full">
+                  <Preloader left="-10%"/>
+                </div>
             )}
             {error && (
               <div className="p-6 bg-red-600/30 dark:bg-red-600/20 border border-red-500/40 dark:border-red-500/30 rounded-lg backdrop-blur-md">

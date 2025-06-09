@@ -26,6 +26,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
+import Preloader from "../components/Preloader";
 
 ChartJS.register(
   LineElement,
@@ -78,21 +79,21 @@ const TestHistoryPage = () => {
 
         if (responseData.success) {
           setTestHistory(responseData.data);
-          
+
           const data = responseData.data;
           const completedTests = data.filter(test => test.status === "succeeded");
           const canceledTests = data.filter(test => test.status === "canceled");
           const inProgressTests = data.filter(test => test.status === "in_progress");
-          
+
           const totalScorePercentage = completedTests.reduce(
             (sum, test) => sum + (test.scorePercentage || 0),
             0
           );
-          
-          const bestScore = completedTests.length > 0 
+
+          const bestScore = completedTests.length > 0
             ? Math.max(...completedTests.map(test => test.scorePercentage || 0))
             : 0;
-            
+
           const totalTimeSpent = data.reduce((sum, test) => {
             if (test.completedAt && test.startedAt) {
               const duration = new Date(test.completedAt) - new Date(test.startedAt);
@@ -273,7 +274,9 @@ const TestHistoryPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 dark:border-indigo-300 mb-4 mx-auto"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <div className="text-gray-600 dark:text-gray-300 text-lg font-medium">
             Loading your test history...
           </div>
@@ -329,7 +332,7 @@ const TestHistoryPage = () => {
             </div>
           </div>
 
-          
+
 
           {/* Analytics Section */}
           <div className="border-b border-gray-200 dark:border-gray-600">
@@ -346,7 +349,7 @@ const TestHistoryPage = () => {
                 <ChevronDown className="w-6 h-6 text-gray-600 dark:text-gray-300" />
               )}
             </button>
-            
+
             {isAnalyticsOpen && (
               testHistory.length === 0 ? (
                 <EmptyAnalytics />
@@ -448,19 +451,18 @@ const TestHistoryPage = () => {
                         </td>
                         <td className="px-8 py-5 whitespace-nowrap">
                           <span
-                            className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                              test.status === "succeeded"
+                            className={`px-3 py-1 text-sm font-semibold rounded-full ${test.status === "succeeded"
                                 ? "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300"
                                 : test.status === "canceled"
-                                ? "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300"
-                                : "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300"
-                            }`}
+                                  ? "bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300"
+                                  : "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300"
+                              }`}
                           >
                             {test.status === "succeeded"
                               ? "Completed"
                               : test.status === "canceled"
-                              ? "Canceled"
-                              : "In Progress"}
+                                ? "Canceled"
+                                : "In Progress"}
                           </span>
                         </td>
                         <td className="px-8 py-5 whitespace-nowrap">
@@ -470,13 +472,12 @@ const TestHistoryPage = () => {
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-2">
                             <div
-                              className={`h-2 rounded-full ${
-                                test.scorePercentage >= 70
+                              className={`h-2 rounded-full ${test.scorePercentage >= 70
                                   ? "bg-green-500 dark:bg-green-400"
                                   : test.scorePercentage >= 40
-                                  ? "bg-yellow-500 dark:bg-yellow-400"
-                                  : "bg-red-500 dark:bg-red-400"
-                              }`}
+                                    ? "bg-yellow-500 dark:bg-yellow-400"
+                                    : "bg-red-500 dark:bg-red-400"
+                                }`}
                               style={{ width: `${test.scorePercentage || 0}%` }}
                             ></div>
                           </div>

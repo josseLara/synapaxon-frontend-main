@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Image as ImageIcon, Edit, Trash2, ArrowLeft, X 
 import axios from '../api/axiosConfig';
 import MediaDisplay from './MediaDisplay';
 import { subjectsByCategory, topicsBySubject } from "../data/questionData";
+import Preloader from "../components/Preloader";
 
 const MyCreatedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -209,7 +210,9 @@ const MyCreatedQuestionsPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 dark:border-blue-400 mb-4 mx-auto"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <div className="text-gray-900 dark:text-gray-300 text-lg font-medium">Loading your created questions...</div>
         </div>
       </div>
@@ -372,8 +375,8 @@ const MyCreatedQuestionsPage = () => {
                     type="button"
                     onClick={() => setFilters(prev => ({ ...prev, difficulty: prev.difficulty === level ? '' : level }))}
                     className={`px-4 py-2 rounded-lg font-medium backdrop-blur-sm border border-white/40 dark:border-gray-700/30 ${filters.difficulty === level
-                        ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
-                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                      ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                      : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
                       }`}
                   >
                     {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -392,8 +395,8 @@ const MyCreatedQuestionsPage = () => {
                     type="button"
                     onClick={() => handleCategoryChange(category)}
                     className={`py-3 px-4 text-center font-medium rounded-lg border border-white/40 dark:border-gray-700/30 ${filters.category === category
-                        ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
-                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                      ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                      : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
                       } backdrop-blur-sm`}
                   >
                     {category}
@@ -415,8 +418,8 @@ const MyCreatedQuestionsPage = () => {
                       type="button"
                       onClick={() => handleSubjectToggle(subject)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.subjects.includes(subject)
-                          ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
-                          : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                        ? 'bg-blue-600/90 dark:bg-blue-600/80 text-white'
+                        : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
                         } backdrop-blur-sm`}
                     >
                       {subject}
@@ -440,8 +443,8 @@ const MyCreatedQuestionsPage = () => {
                         type="button"
                         onClick={() => handleTopicToggle(topic)}
                         className={`py-2 px-3 rounded-lg text-sm font-medium border border-white/40 dark:border-gray-700/30 ${filters.topics.includes(topic)
-                            ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
-                            : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
+                          ? 'bg-green-600/90 dark:bg-green-600/80 text-white'
+                          : 'bg-white/30 dark:bg-black/10 text-gray-900 dark:text-gray-300 hover:bg-white/40 dark:hover:bg-black/20'
                           } backdrop-blur-sm`}
                       >
                         {topic}
@@ -498,7 +501,7 @@ const MyCreatedQuestionsPage = () => {
             </div>
           </div>
 
-          <div className="p-8">
+          <div className="p-8 bg-white dark:bg-gray-800">
             {questions.length === 0 ? (
               <div className="p-16 text-center">
                 <div className="max-w-md mx-auto">

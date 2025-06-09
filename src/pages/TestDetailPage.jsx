@@ -36,6 +36,7 @@ import FilterSection from "../components/FilterSection"
 import QuestionList from "../components/QuestionList"
 import { useNavigate, useParams } from "react-router-dom"
 import ScienceCategories from "../components/progressCard"
+import Preloader from "../components/Preloader"
 
 const OverallPerformanceView = () => {
   const statsRef = useRef(null)
@@ -318,7 +319,9 @@ const OverallPerformanceView = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="w-full">
+            <Preloader />
+          </div>
           <p className="text-gray-600">Loading test details...</p>
         </div>
       </div>

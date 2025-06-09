@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp, Image as ImageIcon, ArrowLeft } from "lucide-react";
 import MediaDisplay from "./MediaDisplay";
 import { categories, subjectsByCategory, topicsBySubject } from "../data/questionData";
+import Preloader from "../components/Preloader";
 
 const AttemptedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -70,22 +71,18 @@ const AttemptedQuestionsPage = () => {
   const fetchCounts = async () => {
     try {
       const allRes = await fetch(
-        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?${difficulty ? `difficulty=${difficulty}&` : ""}${
-          selectedCategory ? `category=${selectedCategory}&` : ""
+        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?${difficulty ? `difficulty=${difficulty}&` : ""}${selectedCategory ? `category=${selectedCategory}&` : ""
         }${selectedSubject ? `subject=${selectedSubject}&` : ""}${selectedTopic ? `topic=${selectedTopic}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const correctRes = await fetch(
-        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?isCorrect=true${difficulty ? `&difficulty=${difficulty}` : ""}${
-          selectedCategory ? `&category=${selectedCategory}` : ""
+        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?isCorrect=true${difficulty ? `&difficulty=${difficulty}` : ""}${selectedCategory ? `&category=${selectedCategory}` : ""
         }${selectedSubject ? `&subject=${selectedSubject}` : ""}${selectedTopic ? `&topic=${selectedTopic}` : ""}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const incorrectRes = await fetch(
-        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?isCorrect=false&flagged=false${
-          difficulty ? `&difficulty=${difficulty}` : ""
-        }${selectedCategory ? `&category=${selectedCategory}` : ""}${selectedSubject ? `&subject=${selectedSubject}` : ""}${
-          selectedTopic ? `&topic=${selectedTopic}` : ""
+        `${import.meta.env.VITE_API_URL || 'https://synapaxon-backend.onrender.com'}/api/student-questions/history?isCorrect=false&flagged=false${difficulty ? `&difficulty=${difficulty}` : ""
+        }${selectedCategory ? `&category=${selectedCategory}` : ""}${selectedSubject ? `&subject=${selectedSubject}` : ""}${selectedTopic ? `&topic=${selectedTopic}` : ""
         }`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -170,11 +167,10 @@ const AttemptedQuestionsPage = () => {
                     setQuestionStatusFilter(filter.value);
                     setPagination((prev) => ({ ...prev, current: 1 }));
                   }}
-                  className={`px-4 py-2 rounded-lg font-medium ${
-                    questionStatusFilter === filter.value
+                  className={`px-4 py-2 rounded-lg font-medium ${questionStatusFilter === filter.value
                       ? "bg-blue-500 text-white"
                       : "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                  }`}
+                    }`}
                 >
                   {filter.label}
                 </button>
@@ -315,8 +311,8 @@ const AttemptedQuestionsPage = () => {
 
           <div className="p-6 relative">
             {loading && (
-              <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75 z-10">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+              <div className="w-full">
+                <Preloader left="-10%" />
               </div>
             )}
             {error && (
@@ -377,15 +373,14 @@ const AttemptedQuestionsPage = () => {
                           {questionDetails[question._id]?.options?.map((option, oIndex) => (
                             <div
                               key={oIndex}
-                              className={`p-4 rounded-lg flex items-center space-x-4 ${
-                                question.selectedAnswer === oIndex && question.isCorrect
+                              className={`p-4 rounded-lg flex items-center space-x-4 ${question.selectedAnswer === oIndex && question.isCorrect
                                   ? "bg-green-50 border border-green-200"
                                   : question.selectedAnswer === oIndex && !question.isCorrect
-                                  ? "bg-red-50 border border-red-200"
-                                  : questionDetails[question._id]?.correctAnswer === oIndex
-                                  ? "bg-blue-50 border border-blue-200"
-                                  : "bg-gray-50 border border-gray-200"
-                              }`}
+                                    ? "bg-red-50 border border-red-200"
+                                    : questionDetails[question._id]?.correctAnswer === oIndex
+                                      ? "bg-blue-50 border border-blue-200"
+                                      : "bg-gray-50 border border-gray-200"
+                                }`}
                             >
                               <div className="flex-shrink-0">
                                 {question.selectedAnswer === oIndex ? (
@@ -482,11 +477,10 @@ const AttemptedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current - 1)}
                         disabled={pagination.current === 1}
-                        className={`px-4 py-2 border text-base font-medium rounded-l-lg ${
-                          pagination.current === 1
+                        className={`px-4 py-2 border text-base font-medium rounded-l-lg ${pagination.current === 1
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         Previous
                       </button>
@@ -494,11 +488,10 @@ const AttemptedQuestionsPage = () => {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`px-5 py-2 border text-base font-medium ${
-                            pagination.current === page
+                          className={`px-5 py-2 border text-base font-medium ${pagination.current === page
                               ? "bg-indigo-600 text-white border-indigo-600"
                               : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -506,11 +499,10 @@ const AttemptedQuestionsPage = () => {
                       <button
                         onClick={() => handlePageChange(pagination.current + 1)}
                         disabled={pagination.current === pagination.pages}
-                        className={`px-4 py-2 border text-base font-medium rounded-r-lg ${
-                          pagination.current === pagination.pages
+                        className={`px-4 py-2 border text-base font-medium rounded-r-lg ${pagination.current === pagination.pages
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         Next
                       </button>
