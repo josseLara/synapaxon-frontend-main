@@ -276,7 +276,8 @@ export default function LandingPage() {
                 Start Free <ArrowRight className="h-5 w-5" />
               </Button>
             </motion.div>
-            <motion.div
+            <span className="pt-5 w-[20px] h-[20px]"></span>
+            {/* <motion.div
               className="pt-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -313,7 +314,7 @@ export default function LandingPage() {
                   <div className="text-white text-sm">Harvard Medical</div>
                 </motion.div>
               </div>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
           <motion.div
             className="space-y-6"
@@ -328,13 +329,14 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
-                <span className="text-blue-200 text-sm">Diagnostic Accuracy</span>
+                {/* <span className="text-blue-200 text-sm">Diagnostic Accuracy</span> */}
+               <div className="text-white text-3xl font-bold">Create your own questions</div>
               </div>
-              <div className="text-white text-3xl font-bold">98.5%</div>
+              {/* <div className="text-white text-3xl font-bold">98.5%</div>
               <div className="flex items-center gap-1 mt-1">
                 <span className="text-blue-200 text-xs">↑ 15%</span>
                 <span className="text-blue-300 text-xs">vs. traditional methods</span>
-              </div>
+              </div> */}
             </motion.div>
 
             <motion.div
@@ -344,13 +346,14 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
-                <span className="text-blue-200 text-sm">Optimized Study Time</span>
+                {/* <span className="text-blue-200 text-sm">Select your test</span> */}
+               <div className="text-white text-3xl font-bold">Select your test</div>
               </div>
-              <div className="text-white text-3xl font-bold">40%</div>
+              {/* <div className="text-white text-3xl font-bold">40%</div>
               <div className="flex items-center gap-1 mt-1">
                 <span className="text-blue-200 text-xs">↓ 40%</span>
                 <span className="text-blue-300 text-xs">less time, better results</span>
-              </div>
+              </div> */}
             </motion.div>
 
             <motion.div
@@ -360,13 +363,13 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
-                <span className="text-blue-200 text-sm">Knowledge Retention</span>
+                {/* <span className="text-blue-200 text-sm">get feedback</span> */}
+               <div className="text-white text-3xl font-bold">Get feedback</div>
               </div>
-              <div className="text-white text-3xl font-bold">85%</div>
-              <div className="flex items-center gap-1 mt-1">
+              {/*<div className="flex items-center gap-1 mt-1">
                 <span className="text-blue-200 text-xs">↑ 60%</span>
                 <span className="text-blue-300 text-xs">better long-term retention</span>
-              </div>
+              </div> */}
             </motion.div>
           </motion.div>
         </div>
