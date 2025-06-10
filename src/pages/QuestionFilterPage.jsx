@@ -283,15 +283,27 @@ export default function QuestionFilterPage() {
         setTotalQuestions(allQuestions.length)
       } else {
         const res = await axios.get(
-          `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""}${selectedSubjects.size > 0 ? `&subjects=${Array.from(selectedSubjects).join(",")}` : ""}${selectedTopics.size > 0 ? `&topics=${Array.from(selectedTopics.values()).flat().join(",")}` : ""}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        )
+          `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""
+          }${selectedSubjects.size > 0
+            ? `&subjects=${Array.from(selectedSubjects).join(",")}`
+            : ""
+          }${selectedTopics.size > 0
+            ? `&subjectTopics=${Array.from(selectedTopics.entries())
+              .map(([subject, topics]) =>
+                topics.map(topic => `${subject}:${encodeURIComponent(topic)}`).join(",")
+              )
+              .join(",")}`
+            : ""
+          }`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         if (!res.data.success) {
           throw new Error(res.data.message || "Failed to fetch questions")
         }
         allQuestions = res.data.data || []
         setTotalQuestions(res.data.count || allQuestions.length)
       }
+      // debugger;
       allQuestions = eliminarDuplicados(allQuestions)
       setQuestions(allQuestions)
     } catch (err) {
@@ -324,7 +336,7 @@ export default function QuestionFilterPage() {
 
   useEffect(() => {
     fetchQuestions()
-  }, [selectedSubjects, selectedTopics])
+  }, [selectedSubjects,selectedTopics])
 
   const toggleSubject = (subject) => {
     setSelectedSubjects((prev) => {
