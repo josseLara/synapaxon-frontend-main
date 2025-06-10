@@ -28,7 +28,8 @@ export const defaultCategories = {
     //     'Otolaryngology', 'Anesthesiology'
     // ],
      'Clinical Specialties': [
-        'Behavioral Health', 'Emergency Medicine', 'Family Medicine', 'Internal Medicine', 'Cardiology',
+        'Behavioral Health', 'Emergency Medicine', 'Family Medicine', 'Internal Medicine', 
+        // 'Cardiology',
         'OB/GYN', 'Pediatrics', 'Surgery'
     ]
 }
