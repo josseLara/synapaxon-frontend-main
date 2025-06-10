@@ -345,7 +345,7 @@ const PerformanceOverviewCard = ({
             </span>
           </motion.div>
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
@@ -355,7 +355,7 @@ const PerformanceOverviewCard = ({
               <Award className="h-4 w-4" />
             </span>
             <span className="text-sm font-medium text-teal-800 dark:text-teal-200">Performance score: 0</span>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </div>

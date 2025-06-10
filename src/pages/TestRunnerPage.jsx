@@ -79,7 +79,7 @@ const TestRunnerPage = () => {
 
   // Retrieve test data
   const testData = location.state || JSON.parse(sessionStorage.getItem('testData')) || {};
-  const usePerQuestionTimer = testData.testDuration && parseInt(testData.testDuration) === 90;
+  const usePerQuestionTimer = testData.testDuration != 0;
 
   // Load struck options and highlights from sessionStorage
   useEffect(() => {
@@ -128,7 +128,7 @@ const TestRunnerPage = () => {
         setUserAnswers(questions.map(q => ({ questionId: q._id, selectedAnswer: null })));
         setQuestionStartTime(Date.now());
         if (usePerQuestionTimer) {
-          setTimeLeft(90);
+          setTimeLeft((testData.testDuration ?? 90) || 90);
         }
 
         setLoading(false);
@@ -163,7 +163,7 @@ const TestRunnerPage = () => {
   // Reset timer on question change
   useEffect(() => {
     if (usePerQuestionTimer && !testCompleted) {
-      setTimeLeft(90);
+      setTimeLeft((testData.testDuration ?? 90) || 90);
       setTimerPaused(false);
       setQuestionStartTime(Date.now());
     }
@@ -567,6 +567,7 @@ const TestRunnerPage = () => {
     }
   };
 
+  // alert(usePerQuestionTimer)
   // End test
   const handleEndTest = () => {
     const unansweredExists = userAnswers.some(a => a.selectedAnswer === null && !submittedQuestions.includes(a.questionId));
@@ -916,13 +917,13 @@ const TestRunnerPage = () => {
                 >
                   <Flag size={20} />
                 </button>
-                <button
+                {/* <button
                   onClick={() => setActiveFeature(activeFeature === 'chat' ? 'none' : 'chat')}
                   className={`hover:bg-blue-700 dark:hover:bg-blue-600 p-1 rounded-full ${activeFeature === 'chat' ? 'text-yellow-400' : 'text-white'}`}
                   aria-label="Chat"
                 >
                   <MessageSquare size={20} />
-                </button>
+                </button> */}
                 <button
                   onClick={() => setActiveFeature(activeFeature === 'calculator' ? 'none' : 'calculator')}
                   className={`hover:bg-blue-700 dark:hover:bg-blue-600 p-1 rounded-full ${activeFeature === 'calculator' ? 'text-yellow-400' : 'text-white'}`}

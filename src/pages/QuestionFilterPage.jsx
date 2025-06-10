@@ -199,7 +199,6 @@ export default function QuestionFilterPage() {
                     : topicFlaggedIds.length
         })
       })
-
       setCategoryCounts(categoryCountMap)
       setSubjectCounts(subjectCountMap)
       setTopicCounts(topicCountMap)
@@ -293,7 +292,7 @@ export default function QuestionFilterPage() {
         allQuestions = res.data.data || []
         setTotalQuestions(res.data.count || allQuestions.length)
       }
-
+      allQuestions = eliminarDuplicados(allQuestions)
       setQuestions(allQuestions)
     } catch (err) {
       console.error("Error fetching questions:", err)
@@ -305,12 +304,27 @@ export default function QuestionFilterPage() {
     }
   }
 
+  function eliminarDuplicados(array) {
+    const idsUnicos = new Set();
+    return array.filter(item => {
+      if (!idsUnicos.has(item._id)) {
+        idsUnicos.add(item._id);
+        return true;
+      }
+      return false;
+    });
+  }
+
   useEffect(() => {
     if (selectedCategory) {
       fetchCounts()
       fetchQuestions()
     }
-  }, [questionStatusFilter, difficulty, selectedCategory,selectedSubjects,selectedTopics])
+  }, [questionStatusFilter, difficulty, selectedCategory])
+
+  useEffect(() => {
+    fetchQuestions()
+  }, [selectedSubjects, selectedTopics])
 
   const toggleSubject = (subject) => {
     setSelectedSubjects((prev) => {
@@ -485,19 +499,18 @@ export default function QuestionFilterPage() {
                     key={filter.value}
                     type="button"
                     onClick={() => setQuestionStatusFilter(filter.value)}
-                    className={`p-3 text-center font-medium transition-all duration-200 rounded-xl border ${
-                      questionStatusFilter === filter.value
-                        ? filter.color === "blue"
-                          ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
-                          : filter.color === "green"
-                            ? "bg-green-600 text-white border-green-600 shadow-lg shadow-green-600/25"
-                            : filter.color === "red"
-                              ? "bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/25"
-                              : filter.color === "gray"
-                                ? "bg-gray-600 text-white border-gray-600 shadow-lg shadow-gray-600/25"
-                                : "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-600/25"
-                        : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md"
-                    }`}
+                    className={`p-3 text-center font-medium transition-all duration-200 rounded-xl border ${questionStatusFilter === filter.value
+                      ? filter.color === "blue"
+                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
+                        : filter.color === "green"
+                          ? "bg-green-600 text-white border-green-600 shadow-lg shadow-green-600/25"
+                          : filter.color === "red"
+                            ? "bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/25"
+                            : filter.color === "gray"
+                              ? "bg-gray-600 text-white border-gray-600 shadow-lg shadow-gray-600/25"
+                              : "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-600/25"
+                      : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md"
+                      }`}
                   >
                     <div className="text-sm font-medium">{filter.label}</div>
                     <div className="text-xs opacity-90">Q{filter.count}</div>
@@ -535,11 +548,10 @@ export default function QuestionFilterPage() {
                 key={cat.name}
                 type="button"
                 onClick={() => setSelectedCategory(cat.name)}
-                className={`p-4 text-center font-medium transition-all duration-200 rounded-xl border ${
-                  selectedCategory === cat.name
-                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25 transform scale-105"
-                    : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:scale-102"
-                }`}
+                className={`p-4 text-center font-medium transition-all duration-200 rounded-xl border ${selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25 transform scale-105"
+                  : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:scale-102"
+                  }`}
               >
                 <div className="text-lg font-semibold">{cat.name}</div>
                 <div className="text-sm opacity-90">Q{categoryCounts[cat.name]?.[questionStatusFilter] || 0}</div>
@@ -559,13 +571,12 @@ export default function QuestionFilterPage() {
                 return (
                   <label
                     key={subject}
-                    className={`p-4 rounded-xl border select-none flex items-center justify-between cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
-                        : count === 0
-                          ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed"
-                          : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md"
-                    }`}
+                    className={`p-4 rounded-xl border select-none flex items-center justify-between cursor-pointer transition-all duration-200 ${isSelected
+                      ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
+                      : count === 0
+                        ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed"
+                        : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md"
+                      }`}
                   >
                     <input
                       type="checkbox"
@@ -603,11 +614,10 @@ export default function QuestionFilterPage() {
                 <button
                   key={subject}
                   onClick={() => setActiveSubject(subject)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeSubject === subject
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  }`}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeSubject === subject
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    }`}
                 >
                   {subject}
                 </button>
@@ -626,13 +636,12 @@ export default function QuestionFilterPage() {
                     return (
                       <label
                         key={key}
-                        className={`p-3 rounded-lg border select-none flex items-center justify-between cursor-pointer transition-all duration-200 ${
-                          isSelected
-                            ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                            : count === 0
-                              ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed"
-                              : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
-                        }`}
+                        className={`p-3 rounded-lg border select-none flex items-center justify-between cursor-pointer transition-all duration-200 ${isSelected
+                          ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                          : count === 0
+                            ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed"
+                            : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
+                          }`}
                       >
                         <input
                           type="checkbox"
@@ -675,7 +684,7 @@ export default function QuestionFilterPage() {
         )}
 
         {/* Available Questions Summary */}
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800 shadow-lg mt-8">
+        {/* <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800 shadow-lg mt-8">
           <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-3">Available Questions</h3>
           <div className="space-y-2">
             <p className="text-green-700 dark:text-green-300 text-lg">
@@ -694,7 +703,7 @@ export default function QuestionFilterPage() {
               )}
             </p>
           </div>
-        </div>
+        </div> */}
 
         {/* Test Configuration */}
         <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-blue-200/30 dark:border-gray-700/30 shadow-lg mt-8">
@@ -704,16 +713,17 @@ export default function QuestionFilterPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => setUseTimer(!useTimer)}
-                  className={`relative inline-block w-14 h-7 rounded-full transition-all duration-300 ${
-                    useTimer ? "bg-blue-600 shadow-lg shadow-blue-600/25" : "bg-gray-300 dark:bg-gray-600"
-                  }`}
+                  onClick={() => {
+                    setUseTimer(!useTimer)
+                    setTestDuration((questions.length ? questions.length : 1) * 90)
+                  }}
+                  className={`relative inline-block w-14 h-7 rounded-full transition-all duration-300 ${useTimer ? "bg-blue-600 shadow-lg shadow-blue-600/25" : "bg-gray-300 dark:bg-gray-600"
+                    }`}
                   aria-label="Toggle timer"
                 >
                   <span
-                    className={`absolute top-0.5 w-6 h-6 rounded-full transition-all duration-300 bg-white shadow-md ${
-                      useTimer ? "left-[calc(100%-1.5rem-0.125rem)]" : "left-0.5"
-                    }`}
+                    className={`absolute top-0.5 w-6 h-6 rounded-full transition-all duration-300 bg-white shadow-md ${useTimer ? "left-[calc(100%-1.5rem-0.125rem)]" : "left-0.5"
+                      }`}
                   ></span>
                 </button>
                 <label className="text-lg font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
@@ -776,11 +786,10 @@ export default function QuestionFilterPage() {
           <button
             onClick={startTest}
             disabled={isLoading || selectedSubjects.size === 0 || questions.length === 0}
-            className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 ${
-              selectedSubjects.size > 0 && questions.length > 0
-                ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/30"
-                : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-            }`}
+            className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 ${selectedSubjects.size > 0 && questions.length > 0
+              ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/30"
+              : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              }`}
           >
             {isLoading ? "Starting..." : `Start Test (${Math.min(numberOfItems, questions.length, 50)} questions)`}
           </button>
