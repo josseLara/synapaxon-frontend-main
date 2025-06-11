@@ -111,7 +111,7 @@ export default function LandingPage() {
       name: "Premium",
       price: 29,
       description: "For power users",
-      maxQuestions: "Unlimited",
+      maxQuestions: "100",
       maxChats: 100,
       maxAgents: 50,
       daysFree: 0,
@@ -339,7 +339,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-blue-200 h-5 w-5" />
                 {/* <span className="text-blue-200 text-sm">Diagnostic Accuracy</span> */}
-                <div className="text-white text-3xl font-bold">Create your own questions</div>
+                <div className="text-white text-3xl font-bold">Upload your own questions and explanations</div>
               </div>
               {/* <div className="text-white text-3xl font-bold">98.5%</div>
               <div className="flex items-center gap-1 mt-1">
@@ -441,10 +441,10 @@ export default function LandingPage() {
                 </span>
               </div> */}
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-                Comprehensive Question Bank
+                Question Bank
               </h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-                Access thousands of questions organized by Basic Sciences, Organ Systems and Clinical Specialties with detailed explanations.
+                Ability to access thousands of questions that you created, organized by Basic Sciences, Organ Systems, and Clinical Specialties, with detailed explanations.
               </p>
             </motion.div>
 
@@ -550,10 +550,10 @@ export default function LandingPage() {
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-                Practice with Real Cases
+                Integrated AI assistant
               </h3>
               <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                Solve questions based on real clinical cases with different difficulty levels and immediate feedback.
+                Use our AI agent to help you create and upload content in seconds
               </p>
             </motion.div>
 
@@ -827,10 +827,10 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                Are the questions based on real cases?
+                Is there limits to how much I can upload?
               </h3>
               <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                Absolutely. All our questions are based on real clinical cases and are reviewed by medical specialists to ensure their accuracy and relevance.
+                yes limits will be applied if you exceed your daily usage
               </p>
             </motion.div>
 
@@ -846,6 +846,20 @@ export default function LandingPage() {
               </h3>
               <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                 Our analytics system provides detailed reports of your performance by specialty, but it is not a replacement for real evaluation exams.
+              </p>
+            </motion.div>
+            <motion.div
+              className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-sm transition-colors duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                Is there limits to how much I can upload?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                yes limits will be applied if you exceed your daily usage, but you can manually add any questions, explanations and attach files
               </p>
             </motion.div>
           </div>

@@ -37,6 +37,7 @@ export const generateQuestionsFromDocumentAI = async (
   userInstructions?: string,
   literalMode?: boolean
 ): Promise<AIGenerateQuestionsResponse> => {
+
   const formData = new FormData();
   files.forEach((file) => {
     formData.append('files', file); // Key must match FastAPI endpoint's `files` parameter
@@ -45,7 +46,7 @@ export const generateQuestionsFromDocumentAI = async (
   if (userInstructions) {
     formData.append('user_instructions', userInstructions);
   }
-    formData.append('literal_mode', literalMode ? 'true' : 'false');
+  formData.append('literal_mode', literalMode ? 'true' : 'false');
   try {
     // The endpoint path defined in your FastAPI app
     const response = await aiApiClient.post<AIGenerateQuestionsResponse>(
@@ -85,9 +86,18 @@ export const generateQuestionsFromDocumentAI = async (
 export const generateQuestionsFromTextAI = async (
   rawText: string,
   userInstructions?: string,
-  literalMode?: boolean
+  literalMode?: boolean,
 ): Promise<AIGenerateQuestionsResponse> => {
   try {
+    // Validar límite de caracteres si no es usuario Pro
+    if (rawText.length > 1000) {
+      return {
+        success: false,
+        data: null,
+        message: 'El texto excede el límite de 1000 caracteres para usuarios no Pro.',
+      };
+    }
+
     const payload = {
       raw_text: rawText,
       user_instructions: userInstructions,

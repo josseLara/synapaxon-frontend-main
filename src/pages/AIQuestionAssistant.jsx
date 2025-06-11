@@ -929,7 +929,7 @@ const AIQuestionAssistant = () => {
                           }}
                         >
                           <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                            {question.questionText}
+                            **{question.questionText}**
                           </p>
                           <div className="mt-2 space-y-1">
                             {question.options.map((option, idx) => (
@@ -941,7 +941,7 @@ const AIQuestionAssistant = () => {
                                     : 'text-gray-600 dark:text-gray-300'
                                 }`}
                               >
-                                {String.fromCharCode(65 + idx)}. {option}
+                                *   ** {String.fromCharCode(65 + idx)}. {option} **
                               </p>
                             ))}
                           </div>

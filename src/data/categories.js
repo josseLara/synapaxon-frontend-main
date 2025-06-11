@@ -8,9 +8,9 @@ export const defaultCategories = {
     //     'General/Mixed Topics', 'Social Sciences', 'Ethics', 'Communication', 'Population Health',
     //     'Risk Factors & Prognosis', 'Screening', 'Risk Factors', 'Prognosis'
     // ],
-     'Basic Sciences': [
+    'Basic Sciences': [
         'Anatomy', 'Physiology', 'Pharmacology', 'Pathology', 'Biochemistry', 'Microbiology',
-        'General/Mixed Topics', 'Risk Factors & Prognosis'
+        'General/Mixed Topics', 'Risk Factors & Prognosis', 'Biostatistics', 'Immunology'
     ],
 
     'Organ Systems': [
@@ -27,8 +27,8 @@ export const defaultCategories = {
     //     'Trauma Surgery', 'Urologic Surgery', 'Vascular Surgery', 'Ophthalmology',
     //     'Otolaryngology', 'Anesthesiology'
     // ],
-     'Clinical Specialties': [
-        'Behavioral Health', 'Emergency Medicine', 'Family Medicine', 'Internal Medicine', 
+    'Clinical Specialties': [
+        'Behavioral Health', 'Emergency Medicine', 'Family Medicine', 'Internal Medicine',
         // 'Cardiology',
         'OB/GYN', 'Pediatrics', 'Surgery'
     ]
