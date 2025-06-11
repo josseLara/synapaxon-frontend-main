@@ -360,11 +360,11 @@ const AttemptedQuestionsPage = () => {
           </div>
 
           <div className="p-6 relative">
-            {loading && (
+            {/* {loading && (
                 <div className="w-full">
                   <Preloader left="-10%"/>
                 </div>
-            )}
+            )} */}
             {error && (
               <div className="p-6 bg-red-600/30 dark:bg-red-600/20 border border-red-500/40 dark:border-red-500/30 rounded-lg backdrop-blur-md">
                 <div className="flex items-center">
