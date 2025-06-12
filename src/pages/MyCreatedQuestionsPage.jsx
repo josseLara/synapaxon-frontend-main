@@ -16,6 +16,8 @@ const MyCreatedQuestionsPage = () => {
   const [editQuestionData, setEditQuestionData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
+  const [showModalDisplayId, setShowModalDisplayId] = useState(null);
+
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -525,7 +527,8 @@ const MyCreatedQuestionsPage = () => {
                 {questions.map((question, qIndex) => (
                   <div
                     key={question._id}
-                    className="mb-6 bg-white/30 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-gray-700/30 rounded-xl shadow-sm hover:shadow-lg transition-all"
+                    className={`mb-6 bg-white/30 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-gray-700/30 rounded-xl shadow-sm hover:shadow-lg transition-all relative ${expandedQuestions[question._id] || showModalDisplayId === question._id ? 'z-[1000]' : ''
+                      }`}
                   >
                     <button
                       onClick={() => toggleQuestion(question._id)}
@@ -542,7 +545,10 @@ const MyCreatedQuestionsPage = () => {
                                 key={media._id || index}
                                 media={media}
                                 label={`Question Media ${index + 1}`}
+                                onOpenModal={() => setShowModalDisplayId(question._id)}
+                                onCloseModal={() => setShowModalDisplayId(null)}
                               />
+
                             ))}
                           </div>
                         )}

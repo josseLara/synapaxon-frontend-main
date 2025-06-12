@@ -397,7 +397,7 @@ const AttemptedQuestionsPage = () => {
                 {filteredQuestions.map((question, index) => (
                   <div
                     key={question._id}
-                    className="mb-6 bg-white/30 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-gray-700/30 rounded-xl shadow-sm hover:shadow-lg transition-all"
+                    className="mb-6 bg-white/30 dark:bg-black/20 backdrop-blur-sm border border-white/40 dark:border-gray-700/30 rounded-xl shadow-sm hover:shadow-lg transition-all relative"
                   >
                     <button
                       onClick={() => toggleQuestion(question._id)}

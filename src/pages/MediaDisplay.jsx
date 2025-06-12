@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
-export default function MediaDisplay({ media, label }) {
+export default function MediaDisplay({ media, label, onOpenModal, onCloseModal }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [size, setSize] = useState({ width: 800, height: 600 });
@@ -35,6 +35,7 @@ export default function MediaDisplay({ media, label }) {
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
+    onOpenModal?.();
     setPosition({ x: window.innerWidth / 8, y: window.innerHeight / 8 });
     setSize({ width: 800, height: 600 });
     setError(null);
@@ -44,6 +45,7 @@ export default function MediaDisplay({ media, label }) {
     setIsModalOpen(false);
     setIsDragging(false);
     setIsResizing(false);
+    onCloseModal?.();
     setError(null);
   };
 
@@ -104,111 +106,114 @@ export default function MediaDisplay({ media, label }) {
   }, [isModalOpen, isDragging, isResizing, dragStart, position, resizeStart]);
 
   const renderMedia = () => {
-  try {
-    const isYouTube = url?.includes('youtube.com/embed/');
-    const isWebsite = media.mimetype === 'text/url' || media.type === 'url';
+    try {
+      const isYouTube = url?.includes('youtube.com/embed/');
+      const isWebsite = media.mimetype === 'text/url' || media.type === 'url';
 
-    if (isYouTube) {
-      return (
-        <iframe
-          src={url}
-          title="YouTube Video"
-          frameBorder="0"
-          allowFullScreen
-          style={{ width: '100%', height: '100%' }}
-        />
-      );
+      if (isYouTube) {
+        return (
+          <iframe
+            src={url}
+            title="YouTube Video"
+            frameBorder="0"
+            allowFullScreen
+            style={{ width: '100%', height: '100%' }}
+          />
+        );
+      }
+
+      if (isWebsite) {
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center text-center">
+            <iframe
+              src={url}
+              title="Embedded Website"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: '1px solid #ccc',
+                backgroundColor: '#f8f8f8'
+              }}
+              onLoad={(e) => {
+                const frameDoc = e.target?.contentDocument || e.target?.contentWindow?.document;
+                if (!frameDoc || frameDoc.body.innerHTML.trim() === '') {
+                  setIframeError(true);
+                }
+              }}
+            />
+            {iframeError && (
+              <p className="text-sm text-red-500 mt-2">This site refused to connect in an iframe.</p>
+            )}
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline mt-2"
+            >
+              Open in new tab
+            </a>
+          </div>
+        );
+      }
+
+
+      if (media.mimetype?.startsWith('image/')) {
+        return (
+          <img
+            src={url}
+            alt={media.originalname || 'Image'}
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+            onError={() => setError('Failed to load image')}
+          />
+        );
+      } else if (media.mimetype?.startsWith('video/')) {
+        return (
+          <video
+            controls
+            src={url}
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+            onError={() => setError('Failed to load video')}
+          />
+        );
+      } else if (media.mimetype?.startsWith('application/pdf')) {
+        return (
+          <embed
+            src={url}
+            type="application/pdf"
+            style={{ width: '100%', height: '100%' }}
+            onError={() => setError('Failed to load PDF')}
+          />
+        );
+      } else if (
+        media.mimetype?.startsWith('application/msword') ||
+        media.mimetype?.startsWith('application/vnd.openxmlformats-officedocument')
+      ) {
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            {media.originalname || 'Download Document'}
+          </a>
+        );
+      } else {
+        return (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            {media.originalname || 'Download Media'}
+          </a>
+        );
+      }
+    } catch (err) {
+      setError('Error rendering media');
+      return null;
     }
-    
-    if (isWebsite) {
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center text-center">
-      <iframe
-        src={url}
-        title="Embedded Website"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-        style={{
-          width: '100%',
-          height: '100%',
-          border: '1px solid #ccc',
-          backgroundColor: '#f8f8f8'
-        }}
-        onLoad={(e) => {
-          const frameDoc = e.target?.contentDocument || e.target?.contentWindow?.document;
-          if (!frameDoc || frameDoc.body.innerHTML.trim() === '') {
-            setIframeError(true);
-          }
-        }}
-      />
-      {iframeError && (
-        <p className="text-sm text-red-500 mt-2">This site refused to connect in an iframe.</p>
-      )}
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-600 underline mt-2"
-      >
-        Open in new tab
-      </a>
-    </div>
-  );
-}
-
-
-    if (media.mimetype?.startsWith('image/')) {
-      return (
-        <img 
-          src={url} 
-          alt={media.originalname || 'Image'} 
-          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
-          onError={() => setError('Failed to load image')} 
-        />
-      );
-    } else if (media.mimetype?.startsWith('video/')) {
-      return (
-        <video 
-          controls 
-          src={url} 
-          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
-          onError={() => setError('Failed to load video')} 
-        />
-      );
-    } else if (media.mimetype?.startsWith('application/pdf')) {
-      return (
-        <embed 
-          src={url} 
-          type="application/pdf" 
-          style={{ width: '100%', height: '100%' }} 
-          onError={() => setError('Failed to load PDF')} 
-        />
-      );
-    } else if (
-      media.mimetype?.startsWith('application/msword') ||
-      media.mimetype?.startsWith('application/vnd.openxmlformats-officedocument')
-    ) {
-      return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-          {media.originalname || 'Download Document'}
-        </a>
-      );
-    } else {
-      return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-          {media.originalname || 'Download Media'}
-        </a>
-      );
-    }
-  } catch (err) {
-    setError('Error rendering media');
-    return null;
-  }
-};
+  };
 
 
   return (
     <>
-      <button onClick={handleOpenModal} className="text-blue-600 hover:underline text-sm ml-2">
+      <button onClick={(e) => {
+        e.stopPropagation();
+        handleOpenModal();
+      }} className="text-blue-600 hover:underline text-sm ml-2">
         {label || 'View Media'}
       </button>
       {isModalOpen && (
@@ -237,18 +242,18 @@ export default function MediaDisplay({ media, label }) {
                 <X size={20} />
               </button>
             </div>
-            <div 
-              ref={contentRef} 
-              className="p-4 flex justify-center items-center" 
-              style={{ flex: 1, width: '100%' }} 
+            <div
+              ref={contentRef}
+              className="p-4 flex justify-center items-center"
+              style={{ flex: 1, width: '100%' }}
               onMouseDown={(e) => e.stopPropagation()}
             >
               {error ? <p className="text-red-500">{error}</p> : renderMedia()}
             </div>
-            <div 
-              className="absolute bottom-0 right-0 w-4 h-4 bg-gray-400 cursor-se-resize resize-handle" 
-              onMouseDown={handleResizeMouseDown} 
-              aria-label="Resize media viewer" 
+            <div
+              className="absolute bottom-0 right-0 w-4 h-4 bg-gray-400 cursor-se-resize resize-handle"
+              onMouseDown={handleResizeMouseDown}
+              aria-label="Resize media viewer"
             />
           </div>
         </div>

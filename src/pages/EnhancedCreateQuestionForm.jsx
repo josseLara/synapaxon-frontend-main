@@ -2,11 +2,11 @@
 
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { X, PlusCircle, Upload, ImageIcon, File, CheckCircle, Plus, Trash2, Paperclip, Link } from "lucide-react"
+import { X, PlusCircle, Upload, ImageIcon, File, CheckCircle, Plus, Trash2, Paperclip, Link, YoutubeIcon } from "lucide-react"
 import axios from "../api/axiosConfig"
 import { subjectsByCategory, topicsBySubject } from "../data/questionData"
 
-const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
+const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => { } }) => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     questionText: "",
@@ -141,12 +141,16 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
 
   const validateUrl = (url) => {
     try {
-      new URL(url)
-      return true
+      new URL(url);
+      // Verificar si es una URL de YouTube
+      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        return true;
+      }
+      return true; // También aceptar otras URLs válidas
     } catch {
-      return false
+      return false;
     }
-  }
+  };
 
   const handleAddUrl = () => {
     if (!urlInput.trim()) {
@@ -194,6 +198,59 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
       setUploadError("Please select at least one file to upload")
       return
     }
+
+    if (!uploadedFiles.length) {
+      setUploadError("Please select at least one file to upload");
+      return;
+    }
+
+    // Verificar tamaño de archivos (10MB = 10 * 1024 * 1024 bytes)
+    const maxSize = 10 * 1024 * 1024;
+    const oversizedFiles = uploadedFiles.filter(file => file.size > maxSize);
+
+    if (oversizedFiles.length > 0) {
+      // Si hay archivos que superan el tamaño máximo, pedir URL de YouTube
+      const youtubeUrl = prompt("One or more files exceed 10MB. Please enter the YouTube URL instead:");
+
+      if (youtubeUrl && validateUrl(youtubeUrl)) {
+        const filename = `youtube-${Date.now()}`;
+        const mediaObject = {
+          type: "youtube",
+          path: youtubeUrl,
+          filename: filename,
+          originalname: "YouTube Video",
+          mimetype: "video/youtube",
+          size: 0,
+        };
+
+        if (uploadingFor === "question") {
+          setFormData({
+            ...formData,
+            questionMedia: [...formData.questionMedia, mediaObject],
+          });
+        } else if (uploadingFor === "explanation") {
+          setFormData({
+            ...formData,
+            explanationMedia: [...formData.explanationMedia, mediaObject],
+          });
+        } else if (typeof uploadingFor === "number") {
+          const updatedOptionMedia = [...formData.optionMedia];
+          updatedOptionMedia[uploadingFor] = [...updatedOptionMedia[uploadingFor], mediaObject];
+          setFormData({ ...formData, optionMedia: updatedOptionMedia });
+        }
+
+        setUploadSuccess(true);
+        setUploadedFiles([]);
+        return;
+      } else if (youtubeUrl && !validateUrl(youtubeUrl)) {
+        setUploadError("Por favor ingresa una URL válida de YouTube");
+        return;
+      } else {
+        // Si el usuario cancela, no hacer nada
+        return;
+      }
+    }
+
 
     setIsUploading(true)
     setUploadError("")
@@ -267,6 +324,7 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
       setIsUploading(false)
     }
   }
+
 
   const handleRemoveUploadedMedia = async (target, index) => {
     const token = localStorage.getItem("token")
@@ -444,8 +502,9 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
     }
   }
 
+
   const renderMediaButton = (target, media) => {
-    const mediaArray = Array.isArray(media) ? media : [media].filter(Boolean)
+    const mediaArray = Array.isArray(media) ? media : [media].filter(Boolean);
 
     return (
       <div className="mt-3">
@@ -461,10 +520,14 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                     <ImageIcon className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
                   ) : mediaItem.type === "url" ? (
                     <Link className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
+                  ) : mediaItem.type === "youtube" ? (
+                    <YoutubeIcon className="w-4 h-4 mr-2 text-red-600 dark:text-red-400" /> // Asegúrate de importar YoutubeIcon
                   ) : (
                     <File className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
                   )}
-                  <span className="truncate text-blue-800 dark:text-blue-200">{mediaItem.originalname}</span>
+                  <span className="truncate text-blue-800 dark:text-blue-200">
+                    {mediaItem.type === "youtube" ? "YouTube Video" : mediaItem.originalname}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -487,8 +550,8 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
           Add Media or URL (Optional)
         </button>
       </div>
-    )
-  }
+    );
+  };
 
   const getFileIcon = (file) => {
     if (!file) return null
@@ -697,11 +760,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                       type="button"
                       onClick={handleUploadMedia}
                       disabled={isUploading}
-                      className={`px-4 py-2 rounded-xl flex items-center font-medium transition-colors ${
-                        isUploading
-                          ? "bg-gray-400 cursor-not-allowed text-white"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
-                      }`}
+                      className={`px-4 py-2 rounded-xl flex items-center font-medium transition-colors ${isUploading
+                        ? "bg-gray-400 cursor-not-allowed text-white"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                        }`}
                     >
                       <Upload size={16} className="mr-2" />
                       {isUploading ? "Uploading..." : "Upload"}
@@ -763,11 +825,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                     <div className="flex items-center space-x-3">
                       <div
                         onClick={() => handleCorrectAnswerSelect(index)}
-                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer font-bold text-lg transition-all duration-200 ${
-                          formData.correctAnswer === index
-                            ? "bg-green-600 text-white shadow-lg shadow-green-600/25"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                        }`}
+                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer font-bold text-lg transition-all duration-200 ${formData.correctAnswer === index
+                          ? "bg-green-600 text-white shadow-lg shadow-green-600/25"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                          }`}
                       >
                         {String.fromCharCode(65 + index)}
                       </div>
@@ -845,11 +906,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                     type="button"
                     key={cat}
                     onClick={() => handleCategoryChange(cat)}
-                    className={`py-3 px-4 text-center font-medium rounded-xl border transition-all duration-200 ${
-                      formData.category === cat
-                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
-                        : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
-                    }`}
+                    className={`py-3 px-4 text-center font-medium rounded-xl border transition-all duration-200 ${formData.category === cat
+                      ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
+                      : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
+                      }`}
                   >
                     {cat}
                   </button>
@@ -868,11 +928,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                     type="button"
                     key={subject}
                     onClick={() => handleSubjectToggle(subject)}
-                    className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                      formData.subjects.some((s) => s.name === subject)
-                        ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                        : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
-                    }`}
+                    className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all duration-200 ${formData.subjects.some((s) => s.name === subject)
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                      : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
+                      }`}
                   >
                     {subject}
                   </button>
@@ -895,11 +954,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
                           type="button"
                           key={topic}
                           onClick={() => handleTopicToggle(topic, subject.name)}
-                          className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all duration-200 ${
-                            subject.topics.includes(topic)
-                              ? "bg-green-600 text-white border-green-600 shadow-md"
-                              : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
-                          }`}
+                          className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all duration-200 ${subject.topics.includes(topic)
+                            ? "bg-green-600 text-white border-green-600 shadow-md"
+                            : "bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-800"
+                            }`}
                         >
                           {topic}
                         </button>
@@ -931,11 +989,10 @@ const EnhancedCreateQuestionForm = ({ onQuestionCreated = () => {} }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  isSubmitting
-                    ? "bg-gray-400 cursor-not-allowed text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30"
-                }`}
+                className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 ${isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30"
+                  }`}
               >
                 {isSubmitting ? "Creating..." : "Create Question"}
               </button>
