@@ -90,11 +90,13 @@ export const generateQuestionsFromTextAI = async (
 ): Promise<AIGenerateQuestionsResponse> => {
   try {
     // Validar límite de caracteres si no es usuario Pro
-    if (rawText.length > 1000) {
+    const wordCount = rawText.trim().split(/\s+/).length;
+
+    if (wordCount > 1000) {
       return {
         success: false,
         data: null,
-        message: 'El texto excede el límite de 1000 caracteres para usuarios no Pro.',
+        message: 'The text exceeds the 1000-word limit for non-Pro users.',
       };
     }
 

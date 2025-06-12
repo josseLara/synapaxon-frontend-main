@@ -9,10 +9,10 @@ import { generateQuestionsFromDocumentAI, generateQuestionsFromTextAI, explainAn
 const AIQuestionAssistant = () => {
   // State Variables
   const [messages, setMessages] = useState([
-    { 
-      id: 1, 
-      type: 'bot', 
-      content: 'Hi! Upload your document (PDF, image, or text), add any instructions in the text box below, and then click the Send button. I\'ll help you generate questions from it.' 
+    {
+      id: 1,
+      type: 'bot',
+      content: 'Hi! Upload your document (PDF, image, or text), add any instructions in the text box below, and then click the Send button. I\'ll help you generate questions from it.'
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -73,21 +73,22 @@ const AIQuestionAssistant = () => {
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     setUploadedFiles(prevStagedFiles => [...prevStagedFiles, ...files]);
-    
+
     files.forEach(file => {
       const message = {
         id: Date.now() + Math.random(),
         type: 'user',
         content: `File staged for sending: ${file.name}`,
-        file: file 
+        file: file
       };
       setMessages(prev => [...prev, message]);
     });
-    
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
+
 
   const generateQuestionsFromFiles = async (filesToProcess, instructionsForAI, forLiteralMode) => {
     if (!filesToProcess || filesToProcess.length === 0) {
@@ -113,7 +114,7 @@ const AIQuestionAssistant = () => {
 
       if (response.success && response.data && response.data.length > 0) {
         const aiGeneratedQuestions = response.data.map(q => ({
-          id: q.id, 
+          id: q.id,
           questionText: q.questionText,
           options: q.options,
           correctAnswer: q.correctAnswer,
@@ -133,7 +134,7 @@ const AIQuestionAssistant = () => {
           content: response.message || "The AI couldn't generate any questions from the provided document(s). Please try a different document or be more specific with instructions.",
         };
         setMessages(prev => [...prev, botMessage]);
-      } else { 
+      } else {
         const botMessage = {
           id: Date.now(),
           type: 'bot',
@@ -141,7 +142,7 @@ const AIQuestionAssistant = () => {
         };
         setMessages(prev => [...prev, botMessage]);
       }
-    } catch (error) { 
+    } catch (error) {
       console.error("Error in generateQuestionsFromFiles component:", error);
       const botMessage = {
         id: Date.now(),
@@ -182,12 +183,55 @@ const AIQuestionAssistant = () => {
     }
   };
 
+  // Función para validar el límite de uso de IA
+  const validateAILimit = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/validate-limit-ai`, {
+        method: 'GET',
+        credentials: 'include', // Para enviar cookies si usas autenticación por sesión
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Si usas JWT
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error validating AI limit:', error);
+      throw error.message;
+    }
+  };
+
   const handleSendMessage = async () => {
     if (isGenerating) {
       setMessages(prev => [...prev, {
         id: Date.now(),
         type: 'bot',
         content: "I'm still working on your previous request. Please wait a moment."
+      }]);
+      return;
+    }
+
+    try {
+      const validation = await validateAILimit();
+      if (!validation.success) {
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          type: 'bot',
+          content: validation.message || "You've reached your daily AI usage limit. Please upgrade your plan or try again tomorrow."
+        }]);
+        return;
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        type: 'bot',
+        content: "Error verifying your AI usage limit. Please try again."
       }]);
       return;
     }
@@ -211,7 +255,7 @@ const AIQuestionAssistant = () => {
       const userMessage = { id: Date.now(), type: 'user', content: currentInputText };
       setMessages(prev => [...prev, userMessage]);
     }
-    
+
     setInputText('');
 
     setIsGenerating(true);
@@ -268,9 +312,9 @@ const AIQuestionAssistant = () => {
       }
 
       if (!currentInputText) {
-         setMessages(prev => [...prev, {
+        setMessages(prev => [...prev, {
           id: Date.now(), type: 'bot',
-          content: `You've selected question: "${activeQuestionForExplanation.questionText.substring(0,50)}...". What would you like to ask about it?`
+          content: `You've selected question: "${activeQuestionForExplanation.questionText.substring(0, 50)}...". What would you like to ask about it?`
         }]);
         setIsGenerating(false);
         return;
@@ -384,10 +428,10 @@ const AIQuestionAssistant = () => {
   };
 
   const handleAddOption = () => {
-    setFormData({ 
-      ...formData, 
-      options: [...formData.options, ''], 
-      optionMedia: [...formData.optionMedia, []] 
+    setFormData({
+      ...formData,
+      options: [...formData.options, ''],
+      optionMedia: [...formData.optionMedia, []]
     });
   };
 
@@ -410,11 +454,11 @@ const AIQuestionAssistant = () => {
       newCorrectAnswer = formData.correctAnswer - 1;
     }
 
-    setFormData({ 
-      ...formData, 
-      options: updatedOptions, 
-      optionMedia: updatedOptionMedia, 
-      correctAnswer: newCorrectAnswer 
+    setFormData({
+      ...formData,
+      options: updatedOptions,
+      optionMedia: updatedOptionMedia,
+      correctAnswer: newCorrectAnswer
     });
   };
 
@@ -434,7 +478,7 @@ const AIQuestionAssistant = () => {
       handleSendMessage();
     }
   };
-  
+
   const handleModalFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
@@ -454,33 +498,33 @@ const AIQuestionAssistant = () => {
   };
 
   const validateUrl = (url) => {
-    try { 
-      new URL(url); 
-      return true; 
-    } catch { 
-      return false; 
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
     }
   };
 
   const handleAddUrl = () => {
-    if (!urlInput.trim()) { 
-      setUploadError('Please enter a URL'); 
-      return; 
+    if (!urlInput.trim()) {
+      setUploadError('Please enter a URL');
+      return;
     }
-    if (!validateUrl(urlInput.trim())) { 
-      setUploadError('Please enter a valid URL (e.g., https://example.com)'); 
-      return; 
+    if (!validateUrl(urlInput.trim())) {
+      setUploadError('Please enter a valid URL (e.g., https://example.com)');
+      return;
     }
 
     const url = urlInput.trim();
     const filename = url.split('/').pop() || `url-${Date.now()}`;
-    const mediaObject = { 
-      type: 'url', 
-      path: url, 
-      filename, 
-      originalname: filename, 
-      mimetype: 'text/url', 
-      size: 0 
+    const mediaObject = {
+      type: 'url',
+      path: url,
+      filename,
+      originalname: filename,
+      mimetype: 'text/url',
+      size: 0
     };
 
     if (uploadingFor === 'question') {
@@ -494,35 +538,35 @@ const AIQuestionAssistant = () => {
         return { ...prev, optionMedia: updatedOptionMedia };
       });
     }
-    setUploadSuccess(true); 
+    setUploadSuccess(true);
     setUrlInput('');
   };
 
   const handleUploadMedia = async () => {
-    if (!modalTempFiles.length) { 
-      setUploadError('Please select at least one file to upload'); 
-      return; 
+    if (!modalTempFiles.length) {
+      setUploadError('Please select at least one file to upload');
+      return;
     }
 
-    setIsUploading(true); 
+    setIsUploading(true);
     setUploadError('');
 
     try {
       const token = localStorage.getItem('token');
-      if (!token) { 
-        setUploadError('Authentication required. Please log in again.'); 
-        setIsUploading(false); 
-        return; 
+      if (!token) {
+        setUploadError('Authentication required. Please log in again.');
+        setIsUploading(false);
+        return;
       }
 
       const formDataObj = new FormData();
       modalTempFiles.forEach(file => formDataObj.append('media', file));
 
-      const response = await axios.post('/api/uploads/multiple', formDataObj, { 
-        headers: { 
-          Authorization: `Bearer ${token}`, 
-          'Content-Type': 'multipart/form-data' 
-        } 
+      const response = await axios.post('/api/uploads/multiple', formDataObj, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       if (response.data.success) {
@@ -539,13 +583,13 @@ const AIQuestionAssistant = () => {
           } else {
             type = 'raw';
           }
-          return { 
-            type, 
-            path: file.path, 
-            filename: file.filename, 
-            originalname: file.originalname, 
-            mimetype: file.mimetype, 
-            size: file.size 
+          return {
+            type,
+            path: file.path,
+            filename: file.filename,
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size
           };
         });
 
@@ -561,14 +605,14 @@ const AIQuestionAssistant = () => {
           });
         }
         setModalTempFiles([]);
-      } else { 
-        setUploadError(response.data.message || 'Failed to upload files'); 
+      } else {
+        setUploadError(response.data.message || 'Failed to upload files');
       }
     } catch (error) {
       console.error('Error uploading files:', error);
       setUploadError(error.message || 'An error occurred while uploading the files');
-    } finally { 
-      setIsUploading(false); 
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -595,14 +639,14 @@ const AIQuestionAssistant = () => {
       }
     }
     if (target === 'question') {
-      setFormData(prev => ({ 
-        ...prev, 
-        questionMedia: prev.questionMedia.filter((_, i) => i !== index) 
+      setFormData(prev => ({
+        ...prev,
+        questionMedia: prev.questionMedia.filter((_, i) => i !== index)
       }));
     } else if (target === 'explanation') {
-      setFormData(prev => ({ 
-        ...prev, 
-        explanationMedia: prev.explanationMedia.filter((_, i) => i !== index) 
+      setFormData(prev => ({
+        ...prev,
+        explanationMedia: prev.explanationMedia.filter((_, i) => i !== index)
       }));
     } else if (typeof target === 'number') {
       setFormData(prev => {
@@ -612,126 +656,126 @@ const AIQuestionAssistant = () => {
       });
     }
 
-    if (uploadingFor === target) { 
-      setModalTempFiles([]); 
-      setUrlInput(''); 
-      setUploadSuccess(false); 
-      setUploadError(''); 
+    if (uploadingFor === target) {
+      setModalTempFiles([]);
+      setUrlInput('');
+      setUploadSuccess(false);
+      setUploadError('');
     }
   };
 
-  const validateMediaObject = (media) => 
-    media && 
-    typeof media === 'object' && 
-    media.filename && 
-    media.originalname && 
-    media.mimetype && 
-    media.path && 
+  const validateMediaObject = (media) =>
+    media &&
+    typeof media === 'object' &&
+    media.filename &&
+    media.originalname &&
+    media.mimetype &&
+    media.path &&
     (media.size !== undefined);
 
   const handleSubmitQuestion = async () => {
     if (!selectedQuestion) return;
 
-    if (formData.questionText.trim() === '') { 
-      setErrorMessage('Question text is required'); 
-      return; 
+    if (formData.questionText.trim() === '') {
+      setErrorMessage('Question text is required');
+      return;
     }
-    if (formData.options.some(option => option.trim() === '')) { 
-      setErrorMessage('All options must be filled'); 
-      return; 
+    if (formData.options.some(option => option.trim() === '')) {
+      setErrorMessage('All options must be filled');
+      return;
     }
-    if (formData.correctAnswer === null) { 
-      setErrorMessage('Please select the correct answer'); 
-      return; 
+    if (formData.correctAnswer === null) {
+      setErrorMessage('Please select the correct answer');
+      return;
     }
-    if (formData.subjects.length === 0) { 
-      setErrorMessage('At least one subject is required'); 
-      return; 
+    if (formData.subjects.length === 0) {
+      setErrorMessage('At least one subject is required');
+      return;
     }
-    if (!formData.explanation.trim()) { 
-      setErrorMessage('Explanation is required'); 
-      return; 
+    if (!formData.explanation.trim()) {
+      setErrorMessage('Explanation is required');
+      return;
     }
-    
-    if (formData.questionMedia.some(media => !validateMediaObject(media))) { 
-      setErrorMessage('All question media objects must include filename, originalname, mimetype, size, and path'); 
-      return; 
+
+    if (formData.questionMedia.some(media => !validateMediaObject(media))) {
+      setErrorMessage('All question media objects must include filename, originalname, mimetype, size, and path');
+      return;
     }
-    if (formData.explanationMedia.some(media => !validateMediaObject(media))) { 
-      setErrorMessage('All explanation media objects must include filename, originalname, mimetype, size, and path'); 
-      return; 
+    if (formData.explanationMedia.some(media => !validateMediaObject(media))) {
+      setErrorMessage('All explanation media objects must include filename, originalname, mimetype, size, and path');
+      return;
     }
-    for (let i = 0; i < formData.optionMedia.length; i++) { 
-      if (formData.optionMedia[i].some(media => !validateMediaObject(media))) { 
-        setErrorMessage(`All media objects for option ${String.fromCharCode(65 + i)} must include filename, originalname, mimetype, size, and path`); 
-        return; 
-      } 
+    for (let i = 0; i < formData.optionMedia.length; i++) {
+      if (formData.optionMedia[i].some(media => !validateMediaObject(media))) {
+        setErrorMessage(`All media objects for option ${String.fromCharCode(65 + i)} must include filename, originalname, mimetype, size, and path`);
+        return;
+      }
     }
-    
+
     try {
-      setIsUploading(true); 
+      setIsUploading(true);
       setErrorMessage('');
       const token = localStorage.getItem('token');
-      if (!token) { 
-        setErrorMessage('Authentication required. Please log in again.'); 
-        setIsUploading(false); 
-        return; 
+      if (!token) {
+        setErrorMessage('Authentication required. Please log in again.');
+        setIsUploading(false);
+        return;
       }
-      
+
       const submissionData = {
-        questionText: formData.questionText, 
+        questionText: formData.questionText,
         explanation: formData.explanation,
-        options: formData.options.map((text, index) => ({ 
-          text, 
-          media: formData.optionMedia[index] 
+        options: formData.options.map((text, index) => ({
+          text,
+          media: formData.optionMedia[index]
         })),
-        correctAnswer: formData.correctAnswer, 
-        difficulty: formData.difficulty, 
+        correctAnswer: formData.correctAnswer,
+        difficulty: formData.difficulty,
         category: formData.category,
-        subjects: formData.subjects, 
-        tags: formData.tags, 
+        subjects: formData.subjects,
+        tags: formData.tags,
         questionMedia: formData.questionMedia,
-        explanationMedia: formData.explanationMedia, 
+        explanationMedia: formData.explanationMedia,
         sourceUrl: formData.sourceUrl
       };
 
-      const response = await axios.post('/api/questions', submissionData, { 
-        headers: { Authorization: `Bearer ${token}` } 
+      const response = await axios.post('/api/questions', submissionData, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.data.success) {
         setSuccessMessage('Question added successfully!');
-        const successMessageObj = { 
-          id: Date.now(), 
-          type: 'bot', 
-          content: `✅ Question successfully added! Category: ${formData.category}, Subjects: ${formData.subjects.map(s => s.name).join(', ')}, Difficulty: ${formData.difficulty}` 
+        const successMessageObj = {
+          id: Date.now(),
+          type: 'bot',
+          content: `✅ Question successfully added! Category: ${formData.category}, Subjects: ${formData.subjects.map(s => s.name).join(', ')}, Difficulty: ${formData.difficulty}`
         };
         setMessages(prev => [...prev, successMessageObj]);
-        setFormData({ 
-          questionText: '', 
-          explanation: '', 
-          options: ['', ''], 
-          correctAnswer: null, 
-          difficulty: 'medium', 
-          category: 'Basic Sciences', 
-          subjects: [], 
-          tags: [], 
-          questionMedia: [], 
-          explanationMedia: [], 
-          optionMedia: Array(2).fill([]), 
-          sourceUrl: '' 
+        setFormData({
+          questionText: '',
+          explanation: '',
+          options: ['', ''],
+          correctAnswer: null,
+          difficulty: 'medium',
+          category: 'Basic Sciences',
+          subjects: [],
+          tags: [],
+          questionMedia: [],
+          explanationMedia: [],
+          optionMedia: Array(2).fill([]),
+          sourceUrl: ''
         });
-        setShowQuestionForm(false); 
+        setShowQuestionForm(false);
         setSelectedQuestion(null);
         setTimeout(() => setSuccessMessage(''), 3000);
-      } else { 
-        setErrorMessage(response.data.message || 'Failed to add question'); 
+      } else {
+        setErrorMessage(response.data.message || 'Failed to add question');
       }
     } catch (error) {
       console.error('Error creating question:', error);
       setErrorMessage(error.response?.data?.message || 'An error occurred while adding the question');
-    } finally { 
-      setIsUploading(false); 
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -746,15 +790,15 @@ const AIQuestionAssistant = () => {
         {mediaArray.length > 0 && (
           <div className="space-y-2 mb-3">
             {mediaArray.map((mediaItem, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-700 rounded-md text-sm"
               >
                 <div className="flex items-center flex-1 overflow-hidden">
                   {mediaItem.type === 'image' ? (
-                    <Image className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-300" /> 
+                    <Image className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-300" />
                   ) : mediaItem.type === 'url' ? (
-                    <Link className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-300" /> 
+                    <Link className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-300" />
                   ) : (
                     <File className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-300" />
                   )}
@@ -762,24 +806,24 @@ const AIQuestionAssistant = () => {
                     {mediaItem.originalname}
                   </span>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={() => handleRemoveUploadedMedia(target, index)} 
-                  className="ml-2 p-1 text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400" 
+                <button
+                  type="button"
+                  onClick={() => handleRemoveUploadedMedia(target, index)}
+                  className="ml-2 p-1 text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
                   title="Remove media"
-                > 
-                  <X size={16} /> 
+                >
+                  <X size={16} />
                 </button>
               </div>
             ))}
           </div>
         )}
-        <button 
-          type="button" 
-          onClick={() => startMediaUpload(target)} 
+        <button
+          type="button"
+          onClick={() => startMediaUpload(target)}
           className="flex items-center text-sm text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200"
-        > 
-          <Paperclip size={14} className="mr-1" /> Add Media or URL (Optional) 
+        >
+          <Paperclip size={14} className="mr-1" /> Add Media or URL (Optional)
         </button>
       </div>
     );
@@ -789,19 +833,19 @@ const AIQuestionAssistant = () => {
     if (!file || !file.type) {
       return <File className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-300" />;
     }
-    
+
     const type = file.type.split('/')[0];
     switch (type) {
-      case 'image': 
+      case 'image':
         return <Image className="w-6 h-6 mr-2 text-blue-500 dark:text-blue-300" />;
-      case 'video': 
+      case 'video':
         return <File className="w-6 h-6 mr-2 text-purple-500 dark:text-purple-300" />;
-      case 'application': 
+      case 'application':
         if (file.type === 'application/pdf') {
           return <File className="w-6 h-6 mr-2 text-red-500 dark:text-red-300" />;
         }
         return <File className="w-6 h-6 mr-2 text-orange-500 dark:text-orange-300" />;
-      default: 
+      default:
         return <File className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-300" />;
     }
   };
@@ -813,7 +857,7 @@ const AIQuestionAssistant = () => {
           onClick={() => {
             setCurrentAIMode('generate');
             setActiveQuestionForExplanation(null);
-            setMessages(prev => [...prev, {id: Date.now(), type: 'bot', content: "Switched to 'Generate Mode'. Upload documents or paste text to create new questions."}])
+            setMessages(prev => [...prev, { id: Date.now(), type: 'bot', content: "Switched to 'Generate Mode'. Upload documents or paste text to create new questions." }])
           }}
           className={`px-4 py-1.5 text-sm rounded ${currentAIMode === 'generate' ? 'bg-blue-500 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}
         >
@@ -822,7 +866,7 @@ const AIQuestionAssistant = () => {
         <button
           onClick={() => {
             setCurrentAIMode('explain');
-            setMessages(prev => [...prev, {id: Date.now(), type: 'bot', content: "Switched to 'Explain Mode'. Click on a previously generated question in the chat to discuss it, then type your query."}])
+            setMessages(prev => [...prev, { id: Date.now(), type: 'bot', content: "Switched to 'Explain Mode'. Click on a previously generated question in the chat to discuss it, then type your query." }])
           }}
           className={`px-4 py-1.5 text-sm rounded ${currentAIMode === 'explain' ? 'bg-green-500 text-white' : 'bg-gray-300 dark:bg-gray-600'}`}
         >
@@ -840,14 +884,12 @@ const AIQuestionAssistant = () => {
         </span>
         <button
           onClick={() => setIsLiteralMode(!isLiteralMode)}
-          className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
-            isLiteralMode ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-          }`}
+          className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${isLiteralMode ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+            }`}
         >
           <span
-            className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-              isLiteralMode ? 'translate-x-6' : 'translate-x-1'
-            }`}
+            className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${isLiteralMode ? 'translate-x-6' : 'translate-x-1'
+              }`}
           />
         </button>
         <span className={`text-sm font-medium ${isLiteralMode ? 'text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -874,7 +916,7 @@ const AIQuestionAssistant = () => {
 
       {/* AI Mode Toggle */}
       {/* {renderModeToggle()}  */}
-       
+
       {/* Literal Toggle */}
       {renderLiteralModeToggle()}
 
@@ -886,11 +928,10 @@ const AIQuestionAssistant = () => {
             className={`mb-6 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-md lg:max-w-lg px-4 py-3 rounded-lg ${
-                message.type === 'user'
-                  ? 'bg-blue-600 dark:bg-blue-500 text-white'
-                  : 'bg-white dark:bg-gray-700 border dark:border-gray-600 shadow-sm'
-              }`}
+              className={`max-w-md lg:max-w-lg px-4 py-3 rounded-lg ${message.type === 'user'
+                ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                : 'bg-white dark:bg-gray-700 border dark:border-gray-600 shadow-sm'
+                }`}
             >
               <div className="flex items-start">
                 {message.type === 'bot' && <Bot className="w-4 h-4 mr-2 mt-1 text-blue-600 dark:text-blue-300" />}
@@ -920,49 +961,64 @@ const AIQuestionAssistant = () => {
                         <div
                           key={question.id}
                           className={`p-4 bg-gray-50 dark:bg-gray-800 rounded border dark:border-gray-600 
-                            ${currentAIMode === 'explain' ? 'cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-800/50' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}
-                            ${activeQuestionForExplanation?.id === question.id && currentAIMode === 'explain' ? 'ring-2 ring-yellow-500 dark:ring-yellow-400' : ''}`}
+          ${currentAIMode === 'explain' ? 'cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-800/50' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}
+          ${activeQuestionForExplanation?.id === question.id && currentAIMode === 'explain' ? 'ring-2 ring-yellow-500 dark:ring-yellow-400' : ''}`}
                           onClick={() => {
                             if (currentAIMode === 'explain') {
                               handleChatQuestionClick(question.id);
                             }
                           }}
                         >
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                            **{question.questionText}**
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-3">
+                            <span className='text-gray-600 dark:text-gray-300 font-light'>{String.fromCharCode(65 + question.correctAnswer)}.</span> {question.questionText}
                           </p>
+
                           <div className="mt-2 space-y-1">
                             {question.options.map((option, idx) => (
                               <p
                                 key={idx}
-                                className={`text-xs ${
-                                  idx === question.correctAnswer
-                                    ? 'text-green-600 dark:text-green-400 font-medium'
-                                    : 'text-gray-600 dark:text-gray-300'
-                                }`}
+                                className={`text-xs ${idx === question.correctAnswer
+                                  ? 'text-green-600 dark:text-green-400 font-medium'
+                                  : 'text-gray-600 dark:text-gray-300'
+                                  }`}
                               >
-                                *   ** {String.fromCharCode(65 + idx)}. {option} **
+                                {String.fromCharCode(65 + idx)}. {option}
                               </p>
                             ))}
                           </div>
+
+                          {/* Botón para personalizar */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleQuestionSelect(question);
                             }}
-                            className="mt-3 text-xs text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200"
+                            className="cursor-pointer mt-3 text-xs text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200"
                           >
                             Customize & Add →
                           </button>
-                          {currentAIMode === 'explain' && activeQuestionForExplanation?.id === question.id && (
-                            <p className="mt-1 text-xs text-yellow-600
 
- dark:text-yellow-400 font-semibold">(Selected for explanation)</p>
+                          {/* Explicación mejorada */}
+                          {currentAIMode === 'explain' && activeQuestionForExplanation?.id === question.id && (
+                            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-400 dark:border-yellow-500">
+                              <div className="text-sm text-yellow-700 dark:text-yellow-300">
+                                <p className="font-bold text-base mb-3">
+                                  {String.fromCharCode(65 + question.correctAnswer)}. <strong>{question.options[question.correctAnswer]}</strong>
+                                </p>
+
+                                <ul className="list-disc ml-5 space-y-2">
+                                  {question.explanation?.map((point, idx) => (
+                                    <li key={idx} className="leading-relaxed" dangerouslySetInnerHTML={{ __html: point }} />
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
                           )}
                         </div>
                       ))}
                     </div>
                   )}
+
                 </div>
               </div>
             </div>
@@ -1023,7 +1079,7 @@ const AIQuestionAssistant = () => {
             placeholder={
               currentAIMode === 'generate'
                 ? (uploadedFiles.length > 0 ? "Type instructions for uploaded files..." : "Paste concepts or type instructions...")
-                : (activeQuestionForExplanation ? `Ask about "${activeQuestionForExplanation.questionText.substring(0,20)}..."` : "Select a question above to discuss...")
+                : (activeQuestionForExplanation ? `Ask about "${activeQuestionForExplanation.questionText.substring(0, 20)}..."` : "Select a question above to discuss...")
             }
             className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 main-chat-input"
             disabled={currentAIMode === 'explain' && !activeQuestionForExplanation && !isGenerating}
@@ -1044,13 +1100,12 @@ const AIQuestionAssistant = () => {
               (!inputText.trim() && (currentAIMode === 'generate' && uploadedFiles.length === 0)) ||
               (currentAIMode === 'explain' && (!activeQuestionForExplanation || !inputText.trim()))
             }
-            className={`p-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg ${
-              (isGenerating ||
+            className={`p-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg ${(isGenerating ||
               (!inputText.trim() && (currentAIMode === 'generate' && uploadedFiles.length === 0)) ||
               (currentAIMode === 'explain' && (!activeQuestionForExplanation || !inputText.trim())))
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:bg-blue-700 dark:hover:bg-blue-700'
-            }`}
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:bg-blue-700 dark:hover:bg-blue-700'
+              }`}
             title={currentAIMode === 'generate' ? "Send message and/or uploaded files" : "Ask for explanation"}
           >
             <Send className="w-5 h-5" />
@@ -1073,7 +1128,7 @@ const AIQuestionAssistant = () => {
             <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-200">
               Customize and Add Question
             </h3>
-            
+
             {successMessage && (
               <div className="mb-6 bg-green-100 dark:bg-green-900/50 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-300 px-4 py-3 rounded flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />
@@ -1085,7 +1140,7 @@ const AIQuestionAssistant = () => {
                 {errorMessage}
               </div>
             )}
-            
+
             {/* Media Upload Sub-Modal */}
             {uploadingFor !== null && (
               <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center">
@@ -1095,24 +1150,24 @@ const AIQuestionAssistant = () => {
                   </h3>
                   <div className="mb-4 flex space-x-4">
                     <label className="flex items-center text-gray-700 dark:text-gray-300">
-                      <input 
-                        type="radio" 
-                        name="mediaType" 
-                        value="file" 
-                        checked={mediaType === 'file'} 
-                        onChange={() => setMediaType('file')} 
-                        className="mr-2" 
+                      <input
+                        type="radio"
+                        name="mediaType"
+                        value="file"
+                        checked={mediaType === 'file'}
+                        onChange={() => setMediaType('file')}
+                        className="mr-2"
                       />
                       Upload File
                     </label>
                     <label className="flex items-center text-gray-700 dark:text-gray-300">
-                      <input 
-                        type="radio" 
-                        name="mediaType" 
-                        value="url" 
-                        checked={mediaType === 'url'} 
-                        onChange={() => setMediaType('url')} 
-                        className="mr-2" 
+                      <input
+                        type="radio"
+                        name="mediaType"
+                        value="url"
+                        checked={mediaType === 'url'}
+                        onChange={() => setMediaType('url')}
+                        className="mr-2"
                       />
                       Paste URL
                     </label>
@@ -1127,19 +1182,19 @@ const AIQuestionAssistant = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-300">
                           Images, videos, PDFs (MAX. 10MB)
                         </p>
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          onChange={handleModalFileChange} 
-                          accept="image/*,video/*,application/pdf" 
-                          multiple 
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={handleModalFileChange}
+                          accept="image/*,video/*,application/pdf"
+                          multiple
                         />
                       </label>
                     ) : mediaType === 'file' && modalTempFiles.length > 0 ? (
                       <div className="space-y-2">
                         {modalTempFiles.map((file, index) => (
-                          <div 
-                            key={index} 
+                          <div
+                            key={index}
                             className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
                           >
                             <div className="flex items-center overflow-hidden">
@@ -1152,10 +1207,10 @@ const AIQuestionAssistant = () => {
                             <div className="flex items-center">
                               {uploadSuccess && modalTempFiles.length === 0 && (
                                 <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-300 mr-2" />
-                              )} 
-                              <button 
-                                type="button" 
-                                onClick={() => setModalTempFiles(prev => prev.filter((_, i) => i !== index))} 
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setModalTempFiles(prev => prev.filter((_, i) => i !== index))}
                                 className="p-1 text-gray-500 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
                               >
                                 <X size={18} />
@@ -1166,16 +1221,16 @@ const AIQuestionAssistant = () => {
                       </div>
                     ) : mediaType === 'url' ? (
                       <div className="flex flex-col space-y-2">
-                        <input 
-                          type="text" 
-                          value={urlInput} 
-                          onChange={(e) => setUrlInput(e.target.value)} 
-                          placeholder="Paste URL (e.g., https://example.com/image.jpg)" 
-                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300" 
+                        <input
+                          type="text"
+                          value={urlInput}
+                          onChange={(e) => setUrlInput(e.target.value)}
+                          placeholder="Paste URL (e.g., https://example.com/image.jpg)"
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
                         />
-                        <button 
-                          type="button" 
-                          onClick={handleAddUrl} 
+                        <button
+                          type="button"
+                          onClick={handleAddUrl}
                           className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-400 flex items-center"
                         >
                           <Link size={16} className="mr-2" />
@@ -1193,48 +1248,47 @@ const AIQuestionAssistant = () => {
                   {uploadSuccess && (
                     <div className="mb-6 text-sm text-green-600 dark:text-green-300 flex items-center">
                       <CheckCircle size={16} className="mr-1" />
-                      {mediaType === 'file' && modalTempFiles.length === 0 
-                        ? 'File(s) uploaded and added!' 
-                        : mediaType === 'url' 
-                        ? 'URL added successfully!' 
-                        : 'Success!'}
+                      {mediaType === 'file' && modalTempFiles.length === 0
+                        ? 'File(s) uploaded and added!'
+                        : mediaType === 'url'
+                          ? 'URL added successfully!'
+                          : 'Success!'}
                     </div>
                   )}
 
                   <div className="flex justify-end space-x-3">
-                    <button 
-                      type="button" 
-                      onClick={() => { 
-                        setUploadingFor(null); 
-                        setModalTempFiles([]); 
-                        setUrlInput(''); 
-                        setMediaType('file'); 
-                        setUploadSuccess(false); 
-                        setUploadError(''); 
-                      }} 
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUploadingFor(null);
+                        setModalTempFiles([]);
+                        setUrlInput('');
+                        setMediaType('file');
+                        setUploadSuccess(false);
+                        setUploadError('');
+                      }}
                       className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       Cancel
                     </button>
-                    {mediaType === 'file' && modalTempFiles.length > 0 && ( 
-                      <button 
-                        type="button" 
-                        onClick={handleUploadMedia} 
-                        disabled={isUploading} 
-                        className={`px-4 py-2 rounded flex items-center ${
-                          isUploading 
-                            ? 'bg-gray-400 dark:bg-gray-500 cursor-not-allowed' 
-                            : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400 text-white'
-                        }`}
+                    {mediaType === 'file' && modalTempFiles.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleUploadMedia}
+                        disabled={isUploading}
+                        className={`px-4 py-2 rounded flex items-center ${isUploading
+                          ? 'bg-gray-400 dark:bg-gray-500 cursor-not-allowed'
+                          : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400 text-white'
+                          }`}
                       >
                         <Upload size={16} className="mr-2" />
                         {isUploading ? 'Uploading...' : 'Upload & Add'}
-                      </button> 
+                      </button>
                     )}
                     {(uploadSuccess || (mediaType === 'file' && modalTempFiles.length === 0 && !uploadError)) && !isUploading && (
-                      <button 
-                        type="button" 
-                        onClick={() => setUploadingFor(null)} 
+                      <button
+                        type="button"
+                        onClick={() => setUploadingFor(null)}
                         className="px-4 py-2 rounded bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-400 text-white"
                       >
                         Done
@@ -1244,23 +1298,23 @@ const AIQuestionAssistant = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="mb-8">
-              <label 
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2" 
+              <label
+                className="block text-gray-700 dark:text-gray-300 font-medium mb-2"
                 htmlFor="questionText"
               >
                 Question Text*
               </label>
-              <textarea 
-                id="questionText" 
-                name="questionText" 
-                value={formData.questionText} 
-                onChange={handleInputChange} 
-                rows="4" 
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300" 
-                placeholder="Enter the question text here..." 
-                required 
+              <textarea
+                id="questionText"
+                name="questionText"
+                value={formData.questionText}
+                onChange={handleInputChange}
+                rows="4"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                placeholder="Enter the question text here..."
+                required
               />
               {renderMediaButton('question', formData.questionMedia)}
             </div>
@@ -1270,9 +1324,9 @@ const AIQuestionAssistant = () => {
                 <label className="block text-gray-700 dark:text-gray-300 font-medium">
                   Options* (Select correct answer)
                 </label>
-                <button 
-                  type="button" 
-                  onClick={handleAddOption} 
+                <button
+                  type="button"
+                  onClick={handleAddOption}
                   className="flex items-center text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200"
                 >
                   <Plus size={16} className="mr-1" /> Add Option
@@ -1282,28 +1336,27 @@ const AIQuestionAssistant = () => {
                 {formData.options.map((option, index) => (
                   <div key={index} className="flex flex-col">
                     <div className="flex items-center">
-                      <div 
-                        onClick={() => handleCorrectAnswerSelect(index)} 
-                        className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center cursor-pointer ${
-                          formData.correctAnswer === index 
-                            ? 'bg-green-500 dark:bg-green-400 text-white' 
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
-                        }`}
+                      <div
+                        onClick={() => handleCorrectAnswerSelect(index)}
+                        className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center cursor-pointer ${formData.correctAnswer === index
+                          ? 'bg-green-500 dark:bg-green-400 text-white'
+                          : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+                          }`}
                       >
                         {String.fromCharCode(65 + index)}
                       </div>
-                      <input 
-                        type="text" 
-                        value={option} 
-                        onChange={(e) => handleOptionChange(index, e.target.value)} 
-                        className="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300" 
-                        placeholder={`Option ${String.fromCharCode(65 + index)}`} 
-                        required 
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) => handleOptionChange(index, e.target.value)}
+                        className="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                        placeholder={`Option ${String.fromCharCode(65 + index)}`}
+                        required
                       />
-                      <button 
-                        type="button" 
-                        onClick={() => handleRemoveOption(index)} 
-                        className="ml-2 p-1 text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400" 
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveOption(index)}
+                        className="ml-2 p-1 text-gray-500 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400"
                         title="Remove option"
                       >
                         <X size={18} />
@@ -1316,21 +1369,21 @@ const AIQuestionAssistant = () => {
             </div>
 
             <div className="mb-8">
-              <label 
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2" 
+              <label
+                className="block text-gray-700 dark:text-gray-300 font-medium mb-2"
                 htmlFor="explanation"
               >
                 Explanation*
               </label>
-              <textarea 
-                id="explanation" 
-                name="explanation" 
-                value={formData.explanation} 
-                onChange={handleInputChange} 
-                rows="4" 
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300" 
-                placeholder="Explain the correct answer..." 
-                required 
+              <textarea
+                id="explanation"
+                name="explanation"
+                value={formData.explanation}
+                onChange={handleInputChange}
+                rows="4"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                placeholder="Explain the correct answer..."
+                required
               />
               {renderMediaButton('explanation', formData.explanationMedia)}
             </div>
@@ -1341,17 +1394,17 @@ const AIQuestionAssistant = () => {
               </label>
               <div className="flex space-x-4">
                 {['easy', 'medium', 'hard'].map((level) => (
-                  <label 
-                    key={level} 
+                  <label
+                    key={level}
                     className="flex items-center cursor-pointer text-gray-700 dark:text-gray-300"
                   >
-                    <input 
-                      type="radio" 
-                      name="difficulty" 
-                      value={level} 
-                      checked={formData.difficulty === level} 
-                      onChange={handleInputChange} 
-                      className="mr-2 h-4 w-4" 
+                    <input
+                      type="radio"
+                      name="difficulty"
+                      value={level}
+                      checked={formData.difficulty === level}
+                      onChange={handleInputChange}
+                      className="mr-2 h-4 w-4"
                     />
                     <span className="capitalize">{level}</span>
                   </label>
@@ -1365,15 +1418,14 @@ const AIQuestionAssistant = () => {
               </label>
               <div className="flex gap-3 flex-wrap">
                 {Object.keys(subjectsByCategory).map(cat => (
-                  <button 
-                    key={cat} 
-                    type="button" 
-                    onClick={() => handleCategoryChange(cat)} 
-                    className={`px-4 py-1.5 text-sm rounded ${
-                      formData.category === cat 
-                        ? 'bg-blue-500 dark:bg-blue-400 text-white' 
-                        : 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
-                    }`}
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => handleCategoryChange(cat)}
+                    className={`px-4 py-1.5 text-sm rounded ${formData.category === cat
+                      ? 'bg-blue-500 dark:bg-blue-400 text-white'
+                      : 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+                      }`}
                   >
                     {cat}
                   </button>
@@ -1387,15 +1439,14 @@ const AIQuestionAssistant = () => {
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {(subjectsByCategory[formData.category] || []).map((subject) => (
-                  <button 
-                    key={subject} 
-                    type="button" 
-                    onClick={() => handleSubjectToggle(subject)} 
-                    className={`px-4 py-1.5 text-sm rounded ${
-                      formData.subjects.some(s => s.name === subject) 
-                        ? 'bg-green-500 dark:bg-green-400 text-white' 
-                        : 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'
-                    }`}
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => handleSubjectToggle(subject)}
+                    className={`px-4 py-1.5 text-sm rounded ${formData.subjects.some(s => s.name === subject)
+                      ? 'bg-green-500 dark:bg-green-400 text-white'
+                      : 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'
+                      }`}
                   >
                     {subject}
                   </button>
@@ -1415,15 +1466,14 @@ const AIQuestionAssistant = () => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {(topicsBySubject[subject.name] || []).map((topic) => (
-                        <button 
-                          type="button" 
-                          key={topic} 
-                          onClick={() => handleTopicToggle(topic, subject.name)} 
-                          className={`py-2 px-4 rounded text-sm font-medium border ${
-                            subject.topics.includes(topic) 
-                              ? 'bg-green-500 dark:bg-green-400 text-white border-green-500 dark:border-green-400' 
-                              : 'bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-800'
-                          }`}
+                        <button
+                          type="button"
+                          key={topic}
+                          onClick={() => handleTopicToggle(topic, subject.name)}
+                          className={`py-2 px-4 rounded text-sm font-medium border ${subject.topics.includes(topic)
+                            ? 'bg-green-500 dark:bg-green-400 text-white border-green-500 dark:border-green-400'
+                            : 'bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-800'
+                            }`}
                         >
                           {topic}
                         </button>
@@ -1435,57 +1485,56 @@ const AIQuestionAssistant = () => {
             )}
 
             <div className="mb-8">
-              <label 
-                className="block text-gray-700 dark:text-gray-300 font-medium mb-2" 
+              <label
+                className="block text-gray-700 dark:text-gray-300 font-medium mb-2"
                 htmlFor="sourceUrl"
               >
                 Source URL (Optional)
               </label>
-              <input 
-                id="sourceUrl" 
-                name="sourceUrl" 
-                type="url" 
-                value={formData.sourceUrl} 
-                onChange={handleInputChange} 
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300" 
-                placeholder="Enter source URL (e.g., https://example.com)" 
+              <input
+                id="sourceUrl"
+                name="sourceUrl"
+                type="url"
+                value={formData.sourceUrl}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
+                placeholder="Enter source URL (e.g., https://example.com)"
               />
             </div>
 
             <div className="flex justify-end space-x-3">
-              <button 
-                type="button" 
-                onClick={() => { 
-                  setShowQuestionForm(false); 
-                  setSelectedQuestion(null); 
-                  setFormData({ 
-                    questionText: '', 
-                    explanation: '', 
-                    options: ['', ''], 
-                    correctAnswer: null, 
-                    difficulty: 'medium', 
-                    category: 'Basic Sciences', 
-                    subjects: [], 
-                    tags: [], 
-                    questionMedia: [], 
-                    explanationMedia: [], 
-                    optionMedia: Array(2).fill([]), 
-                    sourceUrl: '' 
-                  }); 
-                }} 
+              <button
+                type="button"
+                onClick={() => {
+                  setShowQuestionForm(false);
+                  setSelectedQuestion(null);
+                  setFormData({
+                    questionText: '',
+                    explanation: '',
+                    options: ['', ''],
+                    correctAnswer: null,
+                    difficulty: 'medium',
+                    category: 'Basic Sciences',
+                    subjects: [],
+                    tags: [],
+                    questionMedia: [],
+                    explanationMedia: [],
+                    optionMedia: Array(2).fill([]),
+                    sourceUrl: ''
+                  });
+                }}
                 className="px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
-              <button 
-                type="button" 
-                onClick={handleSubmitQuestion} 
-                disabled={isUploading} 
-                className={`px-4 py-2 rounded text-white ${
-                  isUploading 
-                    ? 'bg-gray-400 dark:bg-gray-500 cursor-not-allowed' 
-                    : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400'
-                }`}
+              <button
+                type="button"
+                onClick={handleSubmitQuestion}
+                disabled={isUploading}
+                className={`px-4 py-2 rounded text-white ${isUploading
+                  ? 'bg-gray-400 dark:bg-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400'
+                  }`}
               >
                 {isUploading ? (
                   <div className="flex items-center">
