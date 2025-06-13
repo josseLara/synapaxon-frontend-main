@@ -6,6 +6,7 @@ import MediaDisplay from './MediaDisplay';
 import Calculator from './Calculator';
 import LabValuesModal from './LabValuesModal';
 import Preloader from '../components/Preloader';
+import { ExplanationText } from '../components/ExplanationText';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -1192,7 +1193,8 @@ const TestRunnerPage = () => {
                   )}
                   <div className="mb-4">
                     <h4 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">Explanation</h4>
-                    {renderExplanation(currentQuestion?.explanation, currentQuestion?._id)}
+                    {/* {renderExplanation(currentQuestion?.explanation, currentQuestion?._id)} */}
+                    <ExplanationText  explanation={currentQuestion?.explanation}/>
                   </div>
                   {isQuestionSubmitted && currentQuestion?.explanationMedia?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">

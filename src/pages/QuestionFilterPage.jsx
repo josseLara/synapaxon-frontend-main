@@ -61,7 +61,8 @@ export default function QuestionFilterPage() {
     if (selectedCategory) params.push(`category=${selectedCategory}`)
     if (difficulty !== "all") params.push(`difficulty=${difficulty}`)
     if (selectedSubjects.size > 0) {
-      params.push(`subjects=${Array.from(selectedSubjects).join(",")}`)
+      const subjects = Array.from(selectedSubjects.values()).flat()
+      params.push(`subjects=${subjects.join(",")}`)
     }
     if (selectedTopics.size > 0) {
       const topics = Array.from(selectedTopics.values()).flat()
@@ -90,7 +91,7 @@ export default function QuestionFilterPage() {
       // Build API query for history (without difficulty)
       const historyQueryParams = [`category=${selectedCategory}`]
       if (selectedSubjects.size > 0) {
-        historyQueryParams.push(`subjects=${Array.from(selectedSubjects).join(",")}`)
+        historyQueryParams.push(`subjects=${Array.from(selectedSubjects.values()).flat().join(",")}`)
       }
       if (selectedTopics.size > 0) {
         const topics = Array.from(selectedTopics.values()).flat()
@@ -108,7 +109,20 @@ export default function QuestionFilterPage() {
       const historyQuestions = (historyRes.data.data || []).map(normalizeStudentQuestion).filter(Boolean)
 
       // Build API query for all questions
-      const questionsQuery = `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""}${selectedSubjects.size > 0 ? `&subjects=${Array.from(selectedSubjects).join(",")}` : ""}${selectedTopics.size > 0 ? `&topics=${Array.from(selectedTopics.values()).flat().join(",")}` : ""}`
+      const questionsQuery = `/api/questions?category=${encodeURIComponent(selectedCategory)}&createdBy=me${difficulty !== "all" ? `&difficulty=${encodeURIComponent(difficulty)}` : ""
+        }${selectedSubjects.size > 0
+          ? `&subjects=${Array.from(selectedSubjects.values())
+            .flat()
+            .map(subject => encodeURIComponent(subject))
+            .join(",")}`
+          : ""
+        }${selectedTopics.size > 0
+          ? `&topics=${Array.from(selectedTopics.values())
+            .flat()
+            .map(topic => encodeURIComponent(topic))
+            .join(",")}`
+          : ""
+        }`;
       const allQuestionsRes = await axios.get(questionsQuery, {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -227,13 +241,22 @@ export default function QuestionFilterPage() {
       // Build base history query without difficulty
       const baseHistoryQueryParams = [`category=${selectedCategory}`]
       if (selectedSubjects.size > 0) {
-        baseHistoryQueryParams.push(`subjects=${Array.from(selectedSubjects).join(",")}`)
+        const encodedSubjects = Array.from(selectedSubjects.values())
+          .flat()
+          .map(subject => encodeURIComponent(subject))
+          .join(",");
+        baseHistoryQueryParams.push(`subjects=${encodedSubjects}`);
       }
       if (selectedTopics.size > 0) {
-        const topics = Array.from(selectedTopics.values()).flat()
-        if (topics.length > 0) baseHistoryQueryParams.push(`topics=${topics.join(",")}`)
+        const topics = Array.from(selectedTopics.values())
+          .flat()
+          .map(topic => encodeURIComponent(topic));
+        if (topics.length > 0) {
+          const encodedTopics = topics.join(",");
+          baseHistoryQueryParams.push(`topics=${encodedTopics}`);
+        }
       }
-      const baseHistoryQuery = `/api/student-questions/history?${baseHistoryQueryParams.join("&")}`
+      const baseHistoryQuery = `/api/student-questions/history?${baseHistoryQueryParams.join("&")}`;
 
       if (questionStatusFilter === "correct") {
         const res = await axios.get(`${baseHistoryQuery}&isCorrect=true`, {
@@ -264,7 +287,7 @@ export default function QuestionFilterPage() {
         setTotalQuestions(res.data.count || allQuestions.length)
       } else if (questionStatusFilter === "unattempted") {
         const allQuestionsRes = await axios.get(
-          `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""}${selectedSubjects.size > 0 ? `&subjects=${Array.from(selectedSubjects).join(",")}` : ""}${selectedTopics.size > 0 ? `&topics=${Array.from(selectedTopics.values()).flat().join(",")}` : ""}`,
+          `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""}${selectedSubjects.size > 0 ? `&subjects=${Array.from(selectedSubjects.values()).flat().join(",")}` : ""}${selectedTopics.size > 0 ? `&topics=${Array.from(selectedTopics.values()).flat().join(",")}` : ""}`,
           { headers: { Authorization: `Bearer ${token}` } },
         )
         if (!allQuestionsRes.data.success) {
@@ -285,12 +308,15 @@ export default function QuestionFilterPage() {
         const res = await axios.get(
           `/api/questions?category=${selectedCategory}&createdBy=me${difficulty !== "all" ? `&difficulty=${difficulty}` : ""
           }${selectedSubjects.size > 0
-            ? `&subjects=${Array.from(selectedSubjects).join(",")}`
+            ? `&subjects=${Array.from(selectedSubjects.values())
+              .flat()
+              .map(subject => encodeURIComponent(subject))
+              .join(",")}`
             : ""
           }${selectedTopics.size > 0
             ? `&subjectTopics=${Array.from(selectedTopics.entries())
               .map(([subject, topics]) =>
-                topics.map(topic => `${subject}:${encodeURIComponent(topic)}`).join(",")
+                topics.map(topic => `${encodeURIComponent(subject)}:${encodeURIComponent(topic)}`).join(",")
               )
               .join(",")}`
             : ""
@@ -336,7 +362,7 @@ export default function QuestionFilterPage() {
 
   useEffect(() => {
     fetchQuestions()
-  }, [selectedSubjects,selectedTopics])
+  }, [selectedSubjects, selectedTopics])
 
   const toggleSubject = (subject) => {
     setSelectedSubjects((prev) => {
@@ -422,7 +448,7 @@ export default function QuestionFilterPage() {
         testDuration: useTimer ? Number.parseInt(testDuration) : 0,
         selectedFilters: {
           category: selectedCategory,
-          subjects: Array.from(selectedSubjects),
+          subjects: Array.from(selectedSubjects.values()).flat(),
           topics: Array.from(selectedTopics.entries()).reduce(
             (acc, [subject, topics]) => ({ ...acc, [subject]: topics }),
             {},
@@ -622,7 +648,7 @@ export default function QuestionFilterPage() {
 
             {/* Subject Tabs */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {Array.from(selectedSubjects).map((subject) => (
+              {Array.from(selectedSubjects.values()).flat().map((subject) => (
                 <button
                   key={subject}
                   onClick={() => setActiveSubject(subject)}
@@ -681,7 +707,7 @@ export default function QuestionFilterPage() {
             <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Selected Filters</h3>
               <div className="flex flex-wrap gap-2">
-                {Array.from(selectedSubjects).map((subject) => (
+                {Array.from(selectedSubjects.values()).flat().map((subject) => (
                   <span
                     key={subject}
                     className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"

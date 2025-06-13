@@ -5,6 +5,7 @@ import axios from '../api/axiosConfig';
 import MediaDisplay from './MediaDisplay';
 import { subjectsByCategory, topicsBySubject } from "../data/questionData";
 import Preloader from "../components/Preloader";
+import { ExplanationText } from "../components/ExplanationText";
 
 const MyCreatedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -599,8 +600,8 @@ const MyCreatedQuestionsPage = () => {
                           ))}
                         </div>
                         <div className="mt-6">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-gray-200 mb-2">Explanation</h4>
-                          <p className="text-base text-gray-900 dark:text-gray-300">{question.explanation || "No explanation available"}</p>
+                          {/* <p className="text-base text-gray-900 dark:text-gray-300">{question.explanation || "No explanation available"}</p> */}
+                          <ExplanationText explanation={question.explanation || "No explanation available"} />
                           {question.explanationMedia?.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-2">
                               {question.explanationMedia.map((media, index) => (
