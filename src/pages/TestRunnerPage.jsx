@@ -6,7 +6,7 @@ import MediaDisplay from './MediaDisplay';
 import Calculator from './Calculator';
 import LabValuesModal from './LabValuesModal';
 import Preloader from '../components/Preloader';
-import { ExplanationText } from '../components/ExplanationText';
+import  {ExplanationText}  from '../components/ExplanationText';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -1167,7 +1167,7 @@ const TestRunnerPage = () => {
         {/* Sidebar for Features */}
         {isSidebarNeeded && (
           <div className="w-2/5 py-8 pl-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 relative z-[900]">
               {explanationPosition === 'side' && isQuestionSubmitted ? (
                 <div onMouseUp={handleTextSelection}>
                   <div className="flex justify-between items-center mb-4">

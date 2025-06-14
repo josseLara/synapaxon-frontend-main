@@ -6,6 +6,7 @@ import MediaDisplay from './MediaDisplay';
 import { subjectsByCategory, topicsBySubject } from "../data/questionData";
 import Preloader from "../components/Preloader";
 import { ExplanationText } from "../components/ExplanationText";
+import { ExplanationFormatText } from "../components/ExplanationFormatText";
 
 const MyCreatedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -601,7 +602,7 @@ const MyCreatedQuestionsPage = () => {
                         </div>
                         <div className="mt-6">
                           {/* <p className="text-base text-gray-900 dark:text-gray-300">{question.explanation || "No explanation available"}</p> */}
-                          <ExplanationText explanation={question.explanation || "No explanation available"} />
+                          <ExplanationFormatText explanation={question.explanation || "No explanation available"} />
                           {question.explanationMedia?.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-2">
                               {question.explanationMedia.map((media, index) => (
