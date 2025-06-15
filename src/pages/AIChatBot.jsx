@@ -83,7 +83,7 @@ const AIChatBot = () => {
     }
   };
 
-  // Custom component for links to apply Tailwind CSS classes
+  // Enhanced custom components for better markdown rendering
   const components = {
     a: ({ node, ...props }) => (
       <a
@@ -93,10 +93,48 @@ const AIChatBot = () => {
         rel="noopener noreferrer" // Security best practice for target="_blank"
       />
     ),
-    // You can add more custom components for other markdown elements if needed
-    // For example, to style headings:
-    // h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-2" />,
-    // strong: ({node, ...props}) => <strong {...props} className="font-semibold" />,
+    // Add proper spacing and styling for headings
+    h1: ({ node, ...props }) => (
+      <h1 {...props} className="text-xl font-bold my-3 text-gray-900 dark:text-gray-100" />
+    ),
+    h2: ({ node, ...props }) => (
+      <h2 {...props} className="text-lg font-bold my-2 text-gray-900 dark:text-gray-100" />
+    ),
+    h3: ({ node, ...props }) => (
+      <h3 {...props} className="text-md font-bold my-2 text-gray-900 dark:text-gray-100" />
+    ),
+    // Add spacing for paragraphs
+    p: ({ node, ...props }) => (
+      <p {...props} className="my-2 leading-relaxed" />
+    ),
+    // Style strong/bold text
+    strong: ({ node, ...props }) => (
+      <strong {...props} className="font-semibold text-gray-900 dark:text-gray-100" />
+    ),
+    // Style lists with proper spacing
+    ul: ({ node, ...props }) => (
+      <ul {...props} className="my-2 ml-4 list-disc space-y-1" />
+    ),
+    ol: ({ node, ...props }) => (
+      <ol {...props} className="my-2 ml-4 list-decimal space-y-1" />
+    ),
+    li: ({ node, ...props }) => (
+      <li {...props} className="leading-relaxed" />
+    ),
+    // Style code blocks
+    code: ({ node, inline, ...props }) => 
+      inline ? (
+        <code {...props} className="bg-gray-100 dark:bg-gray-600 px-1 py-0.5 rounded text-sm font-mono" />
+      ) : (
+        <code {...props} className="block bg-gray-100 dark:bg-gray-600 p-2 rounded text-sm font-mono my-2" />
+      ),
+    pre: ({ node, ...props }) => (
+      <pre {...props} className="bg-gray-100 dark:bg-gray-600 p-2 rounded overflow-x-auto my-2" />
+    ),
+    // Style blockquotes
+    blockquote: ({ node, ...props }) => (
+      <blockquote {...props} className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-2 italic" />
+    ),
   };
 
   return (
@@ -152,22 +190,32 @@ const AIChatBot = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`mb-2 ${msg.type === 'user' ? 'text-right' : 'text-left'}`}
+                  className={`mb-2 flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <motion.span
+                  <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`inline-block p-2 rounded-lg ${msg.type === 'user'
+                    className={`inline-block p-3 rounded-lg ${msg.type === 'user'
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                       }`}
                     style={{ maxWidth: '80%' }}
                   >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </motion.span>
+                    {msg.type === 'user' ? (
+                      // For user messages, render plain text to avoid formatting issues
+                      <div className="text-left whitespace-pre-wrap break-words">
+                        {msg.content}
+                      </div>
+                    ) : (
+                      // For AI messages, use ReactMarkdown with full formatting
+                      <div className="prose prose-sm max-w-none dark:prose-invert text-left">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+                  </motion.div>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -176,7 +224,7 @@ const AIChatBot = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-left"
+                className="flex justify-start"
               >
                 <motion.span
                   className="inline-block p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
