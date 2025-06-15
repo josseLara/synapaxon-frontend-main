@@ -4,7 +4,10 @@ import { Plus } from 'lucide-react';
 
 export const ExplanationText = ({ explanation }) => {
   const [highlightColor, setHighlightColor] = useState('#FFFF00');
-  const [highlights, setHighlights] = useState([]);
+  const [highlights, setHighlights] = useState(() => {
+    const saved = localStorage.getItem('savedHighlights');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [selectionData, setSelectionData] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [preferredColors, setPreferredColors] = useState(() => {
@@ -18,6 +21,10 @@ export const ExplanationText = ({ explanation }) => {
   useEffect(() => {
     localStorage.setItem('preferredHighlightColors', JSON.stringify(preferredColors));
   }, [preferredColors]);
+
+  useEffect(() => {
+    localStorage.setItem('savedHighlights', JSON.stringify(highlights));
+  }, [highlights]);
 
   const addPreferredColor = (color) => {
     setPreferredColors(prev => {
