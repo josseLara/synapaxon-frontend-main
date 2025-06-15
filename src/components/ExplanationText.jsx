@@ -1,13 +1,40 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SketchPicker } from 'react-color';
+import { Plus } from 'lucide-react';
 
 export const ExplanationText = ({ explanation }) => {
   const [highlightColor, setHighlightColor] = useState('#FFFF00');
   const [highlights, setHighlights] = useState([]);
   const [selectionData, setSelectionData] = useState(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [preferredColors, setPreferredColors] = useState(() => {
+    const saved = localStorage.getItem('preferredHighlightColors');
+    return saved ? JSON.parse(saved) : ['#FFFF00', '#4CAF50', '#F06292', '#64B5F6', '#FF9800'];
+  });
   const textRef = useRef(null);
   const popoverRef = useRef(null);
   const isInteractingWithPicker = useRef(false);
+
+  useEffect(() => {
+    localStorage.setItem('preferredHighlightColors', JSON.stringify(preferredColors));
+  }, [preferredColors]);
+
+  const addPreferredColor = (color) => {
+    setPreferredColors(prev => {
+      const newColors = [color, ...prev.slice(0, 4)];
+      return newColors;
+    });
+    setHighlightColor(color);
+    setShowColorPicker(false);
+  };
+
+  const getContrastColor = (hexcolor) => {
+    const r = parseInt(hexcolor.slice(1, 3), 16);
+    const g = parseInt(hexcolor.slice(3, 5), 16);
+    const b = parseInt(hexcolor.slice(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128 ? '#000000' : '#FFFFFF';
+  };
 
   // Función para formatear el texto con símbolos especiales
   const formatExplanation = (text) => {
@@ -72,6 +99,7 @@ export const ExplanationText = ({ explanation }) => {
       }
     } else if (!isInteractingWithPicker.current) {
       setSelectionData(null);
+      setShowColorPicker(false);
     }
   };
 
@@ -190,24 +218,51 @@ export const ExplanationText = ({ explanation }) => {
             transform: 'translateX(-50%)',
           }}
         >
-          <div 
-            onMouseEnter={() => isInteractingWithPicker.current = true}
-            onMouseLeave={() => isInteractingWithPicker.current = false}
-          >
-            <SketchPicker
-              color={highlightColor}
-              onChangeComplete={(color) => setHighlightColor(color.hex)}
-              width="220px"
-              presetColors={[
-                '#FFEB3B', '#4CAF50', '#F06292',
-                '#64B5F6', '#FF9800', '#9C27B0'
-              ]}
-            />
+          <div className="flex flex-wrap gap-2 mb-2">
+            {preferredColors.map((color, index) => (
+              <button
+                key={index}
+                className={`w-8 h-8 rounded-md shadow-sm transition-transform hover:scale-110 ${color === highlightColor ? 'ring-2 ring-blue-500' : ''}`}
+                style={{ backgroundColor: color }}
+                onClick={() => {
+                  setHighlightColor(color);
+                }}
+              />
+            ))}
+            <button
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              className="w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+            >
+              <Plus size={20} />
+            </button>
           </div>
-          <div className="flex justify-between mt-2">
+
+          {showColorPicker && (
+            <div 
+              onMouseEnter={() => isInteractingWithPicker.current = true}
+              onMouseLeave={() => isInteractingWithPicker.current = false}
+              className="mb-2"
+            >
+              <SketchPicker
+                color={highlightColor}
+                onChange={(color) => setHighlightColor(color.hex)}
+                onChangeComplete={(color) => {
+                  const newColor = color.hex;
+                  setHighlightColor(newColor);
+                  if (!preferredColors.includes(newColor)) {
+                    addPreferredColor(newColor);
+                  }
+                }}
+                width="220px"
+              />
+            </div>
+          )}
+
+          <div className="flex justify-between">
             <button
               onClick={() => {
                 setSelectionData(null);
+                setShowColorPicker(false);
                 window.getSelection().removeAllRanges();
               }}
               className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition"
@@ -237,13 +292,16 @@ export const ExplanationText = ({ explanation }) => {
                   className="inline-block w-4 h-4 mr-3 rounded-sm shadow-sm"
                   style={{ backgroundColor: h.color }}
                 ></span>
-                <span className="flex-1 truncate text-sm text-gray-600 dark:text-gray-400">
+                <span 
+                  className="flex-1 truncate text-sm text-gray-800 dark:text-gray-200"
+                  // style={{ color: getContrastColor(h.color) }}
+                >
                   {h.text}
                 </span>
                 <button
                   onClick={() => removeHighlight(h.id)}
                   className="ml-2 text-gray-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100"
-                  title="Eliminar resaltado"
+                  title="Remove highlight"
                 >
                   ×
                 </button>

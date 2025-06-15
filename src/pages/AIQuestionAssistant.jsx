@@ -945,7 +945,7 @@ const AIQuestionAssistant = () => {
                       />
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-800 dark:text-gray-200 break-words">{message.content}</p>
+                    <p className="text-sm text-gray-200 dark:text-gray-200 break-words">{message.content}</p>
                   )}
                   {message.file && (
                     <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/50 rounded flex items-center">

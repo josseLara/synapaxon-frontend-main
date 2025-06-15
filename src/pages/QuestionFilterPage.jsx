@@ -507,7 +507,8 @@ export default function QuestionFilterPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Question Status</h3>
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
                 {[
-                  { value: "all", label: `All`, count: categoryCounts[selectedCategory]?.all || 0, color: "blue" },
+                  // { value: "all", label: `All`, count: categoryCounts[selectedCategory]?.all || 0, color: "blue" },
+                  { value: "all", label: `All`, count: (categoryCounts[selectedCategory]?.correct || 0)+(categoryCounts[selectedCategory]?.incorrect || 0)+(categoryCounts[selectedCategory]?.unattempted || 0)+(categoryCounts[selectedCategory]?.flagged || 0), color: "blue" },
                   {
                     value: "correct",
                     label: `Correct`,
