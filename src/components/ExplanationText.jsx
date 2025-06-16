@@ -159,6 +159,7 @@ export const ExplanationText = ({ explanation }) => {
           key={`highlight-${i}`}
           style={{
             backgroundColor: highlight.color,
+            color: getContrastColor(highlight.color),
             padding: '0 2px',
             borderRadius: '3px',
             cursor: 'pointer',
