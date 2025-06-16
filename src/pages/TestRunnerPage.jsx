@@ -8,6 +8,7 @@ import LabValuesModal from './LabValuesModal';
 import Preloader from '../components/Preloader';
 import  {ExplanationText}  from '../components/ExplanationText';
 import AIChatBot from './AIChatBot';
+import {formatTextWithNewlines} from '../assets/formatText';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -1095,7 +1096,7 @@ const TestRunnerPage = () => {
                   <div className="mb-4">
                     <h4 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">Explanation1111</h4>
                     {/* {renderExplanation(currentQuestion?.explanation, currentQuestion?._id)} */}
-                    <ExplanationText explanation={currentQuestion?.explanation} />
+                    <ExplanationText explanation={formatTextWithNewlines(currentQuestion?.explanation)} />
                   </div>
                   {isQuestionSubmitted && currentQuestion?.explanationMedia?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -1196,7 +1197,7 @@ const TestRunnerPage = () => {
                   <div className="mb-4">
                     <h4 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">Explanation</h4>
                     {/* {renderExplanation(currentQuestion?.explanation, currentQuestion?._id)} */}
-                    <ExplanationText  explanation={currentQuestion?.explanation}/>
+                    <ExplanationText  explanation={formatTextWithNewlines(currentQuestion?.explanation)}/>
                   </div>
                   {isQuestionSubmitted && currentQuestion?.explanationMedia?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">

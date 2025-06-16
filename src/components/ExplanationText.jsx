@@ -148,7 +148,7 @@ export const ExplanationText = ({ explanation }) => {
 
       if (startIndex > lastIndex) {
         result.push(
-          <span key={`before-${i}`}>
+          <span style={{ whiteSpace: 'pre-wrap' }} key={`before-${i}`}>
             {formattedText.slice(lastIndex, startIndex)}
           </span>
         );
@@ -163,6 +163,7 @@ export const ExplanationText = ({ explanation }) => {
             padding: '0 2px',
             borderRadius: '3px',
             cursor: 'pointer',
+            whiteSpace: 'pre-wrap'
           }}
           onClick={(e) => {
             e.stopPropagation();
