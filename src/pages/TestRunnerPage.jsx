@@ -7,6 +7,7 @@ import Calculator from './Calculator';
 import LabValuesModal from './LabValuesModal';
 import Preloader from '../components/Preloader';
 import  {ExplanationText}  from '../components/ExplanationText';
+import AIChatBot from './AIChatBot';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -1238,6 +1239,7 @@ const TestRunnerPage = () => {
           </div>
         )}
       </div>
+      <AIChatBot />
     </div>
   );
 };
