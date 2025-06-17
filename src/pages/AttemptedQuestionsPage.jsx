@@ -5,6 +5,7 @@ import MediaDisplay from "./MediaDisplay";
 import { categories, subjectsByCategory, topicsBySubject } from "../data/questionData";
 import axios from '../api/axiosConfig';
 import Preloader from "../components/Preloader";
+import { ExplanationFormatText } from "../components/ExplanationFormatText";
 
 const AttemptedQuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -489,15 +490,10 @@ const AttemptedQuestionsPage = () => {
                           {(() => {
                             const explanation = questionDetails[question._id]?.explanation || "";
                             if (!explanation) return <p className="text-base text-gray-900 dark:text-gray-300">No explanation available</p>;
-                            const segments = explanation.split(".").map((s) => s.trim()).filter((s) => s);
-                            return segments.length <= 1 ? (
+                            return explanation.length <= 1 ? (
                               <p className="text-base text-gray-900 dark:text-gray-300">{explanation}</p>
                             ) : (
-                              <ul className="list-disc pl-5 space-y-2 text-gray-900 dark:text-gray-300 text-base">
-                                {segments.map((segment, i) => (
-                                  <li key={i}>{segment}.</li>
-                                ))}
-                              </ul>
+                              <ExplanationFormatText explanation={explanation} />
                             );
                           })()}
                           {questionDetails[question._id]?.explanationMedia?.length > 0 && (

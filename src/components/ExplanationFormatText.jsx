@@ -167,7 +167,6 @@ export const formatExplanation = (text) => {
         return result.join('\n');
     } else {
         const data = parseMedicalTextToObject(text);
-        debugger;
         const html = [];
 
         // Título principal
