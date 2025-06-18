@@ -12,7 +12,7 @@ export const ExplanationText = ({ explanation }) => {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [preferredColors, setPreferredColors] = useState(() => {
     const saved = localStorage.getItem('preferredHighlightColors');
-    return saved ? JSON.parse(saved) : ['#FFFF00', '#4CAF50', '#F06292', '#64B5F6', '#FF9800'];
+    return saved ? JSON.parse(saved) : ['#FFFF00', '#4CAF50', '#F06292', '#64B5F6'];
   });
   const textRef = useRef(null);
   const popoverRef = useRef(null);
@@ -28,7 +28,7 @@ export const ExplanationText = ({ explanation }) => {
 
   const addPreferredColor = (color) => {
     setPreferredColors(prev => {
-      const newColors = [color, ...prev.slice(0, 4)];
+      const newColors = [color, ...prev.slice(0, 3)];
       return newColors;
     });
     setHighlightColor(color);
@@ -208,7 +208,7 @@ export const ExplanationText = ({ explanation }) => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative explanation-text-container">
       <div
         ref={textRef}
         className="text-base text-gray-900 dark:text-gray-300 p-4 bg-white dark:bg-gray-800 whitespace-pre-wrap"
@@ -220,7 +220,7 @@ export const ExplanationText = ({ explanation }) => {
       {selectionData && (
         <div
           ref={popoverRef}
-          className="fixed z-50 bg-white dark:bg-gray-800 shadow-xl rounded-md p-3"
+          className="fixed z-[1000] bg-white dark:bg-gray-800 shadow-xl rounded-md p-3"
           style={{
             top: `${selectionData.position.top + 5}px`,
             left: `${selectionData.position.left}px`,

@@ -6,10 +6,10 @@ import MediaDisplay from './MediaDisplay';
 import Calculator from './Calculator';
 import LabValuesModal from './LabValuesModal';
 import Preloader from '../components/Preloader';
-import  {ExplanationText}  from '../components/ExplanationText';
+import { ExplanationText } from '../components/ExplanationText';
 import { ExplanationFormatText } from "../components/ExplanationFormatText";
 import AIChatBot from './AIChatBot';
-import {formatTextWithNewlines} from '../assets/formatText';
+import { formatTextWithNewlines } from '../assets/formatText';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -65,6 +65,9 @@ const TestRunnerPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
   const [explanationPosition, setExplanationPosition] = useState('side');
   const highlightMenuRef = useRef(null);
+  const [highlightColor, setHighlightColor] = useState('yellow');
+  // Estados para el resaltado
+  const isInteractingWithPicker = useRef(false);
 
   // Highlight color maps for light and dark modes
   const lightHighlightColors = {
@@ -175,11 +178,15 @@ const TestRunnerPage = () => {
 
   // Handle click outside highlight menu
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (highlightMenuRef.current && !highlightMenuRef.current.contains(e.target)) {
-        setShowHighlightMenu(false);
+    const handleClickOutside = (event) => {
+      if (highlightMenuRef.current && !highlightMenuRef.current.contains(event.target)) {
+        if (!isInteractingWithPicker.current) {
+          setShowHighlightMenu(false);
+          window.getSelection().removeAllRanges();
+        }
       }
     };
+  
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -613,14 +620,31 @@ const TestRunnerPage = () => {
 
   // Handle text selection and show highlight menu
   const handleTextSelection = (e) => {
+    if (isInteractingWithPicker.current) return;
+
+    // Verificar si el clic fue dentro del ExplanationText
+    let element = e.target;
+    while (element) {
+      if (element.classList && element.classList.contains('explanation-text-container')) {
+        return; // No hacer nada si es dentro de ExplanationText
+      }
+      element = element.parentElement;
+    }
+
     const selection = window.getSelection();
-    if (selection.toString().trim() !== '') {
+    const selectedText = selection.toString().trim();
+
+    if (selectedText !== '') {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      setSelectedText(selection.toString());
-      setHighlightPosition({ x: rect.left + window.scrollX, y: rect.bottom + window.scrollY + 10 });
+
+      setSelectedText(selectedText);
+      setHighlightPosition({
+        x: rect.left + window.scrollX + rect.width / 2,
+        y: rect.bottom + window.scrollY + 10
+      });
       setShowHighlightMenu(true);
-    } else {
+    } else if (!isInteractingWithPicker.current) {
       setShowHighlightMenu(false);
     }
   };
@@ -631,12 +655,29 @@ const TestRunnerPage = () => {
     const key = `${questionId}_${Date.now()}`;
     setHighlights(prev => ({
       ...prev,
-      [key]: { text: selectedText, color, questionId }, // Store color name
+      [key]: {
+        text: selectedText,
+        color,
+        questionId,
+        id: Date.now()
+      },
     }));
     setShowHighlightMenu(false);
     window.getSelection().removeAllRanges();
+    isInteractingWithPicker.current = false;
   };
 
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (selection.isCollapsed && !isInteractingWithPicker.current) {
+        setShowHighlightMenu(false);
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => document.removeEventListener('selectionchange', handleSelectionChange);
+  }, []);
   // Remove highlight
   const removeHighlight = (highlightKey) => {
     setHighlights(prev => {
@@ -681,43 +722,51 @@ const TestRunnerPage = () => {
 
     if (highlightsForQuestion.length === 0) return <>{text}</>;
 
-    // Track replacements as spans
-    const fragments = [];
-    let remainingText = text;
+    // Ordenar resaltados por posición en el texto
+    const sortedHighlights = [...highlightsForQuestion].sort((a, b) =>
+      text.indexOf(a[1].text) - text.indexOf(b[1].text)
+    );
 
-    highlightsForQuestion.forEach(([key, { text: highlightText, color: colorName }]) => {
-      const actualColor = isDarkMode ? darkHighlightColors[colorName] : lightHighlightColors[colorName];
+    let result = [];
+    let lastIndex = 0;
 
-      const index = remainingText.indexOf(highlightText);
-      if (index !== -1) {
-        // Push text before match
-        if (index > 0) {
-          fragments.push(remainingText.slice(0, index));
-        }
+    sortedHighlights.forEach(([key, highlight]) => {
+      const startIndex = text.indexOf(highlight.text, lastIndex);
+      if (startIndex === -1) return;
 
-        // Push highlighted span
-        fragments.push(
-          <span
-            key={key}
-            data-key={key}
-            className="highlight text-gray-700 dark:text-gray-200"
-            style={{ backgroundColor: actualColor }}
-          >
-            {highlightText}
-          </span>
-        );
-
-        // Slice remaining text
-        remainingText = remainingText.slice(index + highlightText.length);
+      // Texto antes del resaltado
+      if (startIndex > lastIndex) {
+        result.push(text.slice(lastIndex, startIndex));
       }
+
+      // Texto resaltado
+      const actualColor = isDarkMode ? darkHighlightColors[highlight.color] : lightHighlightColors[highlight.color];
+      result.push(
+        <span
+          key={highlight.id}
+          className="highlight"
+          style={{
+            backgroundColor: actualColor,
+            cursor: 'pointer'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            removeHighlight(key);
+          }}
+        >
+          {highlight.text}
+        </span>
+      );
+
+      lastIndex = startIndex + highlight.text.length;
     });
 
-    // Push any text left after the last match
-    if (remainingText) {
-      fragments.push(remainingText);
+    // Texto restante después del último resaltado
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
     }
 
-    return <>{fragments}</>;
+    return <>{result}</>;
   };
 
 
@@ -869,30 +918,41 @@ const TestRunnerPage = () => {
       {showHighlightMenu && (
         <div
           ref={highlightMenuRef}
-          className="fixed bg-white dark:bg-gray-800 border dark:border-gray-700 rounded shadow-lg p-2 z-40"
-          style={{ top: highlightPosition.y, left: highlightPosition.x }}
+          className="fixed z-50 bg-white dark:bg-gray-800 shadow-xl rounded-md p-3"
+          style={{
+            top: `${highlightPosition.y}px`,
+            left: `${highlightPosition.x}px`,
+            transform: 'translateX(-50%)',
+          }}
+          onMouseEnter={() => isInteractingWithPicker.current = true}
+          onMouseLeave={() => isInteractingWithPicker.current = false}
         >
-          <div className="flex space-x-2">
-            <button
-              onClick={() => applyHighlight('yellow')}
-              className="w-6 h-6 bg-yellow-200 dark:bg-yellow-500 rounded"
-              title="Highlight Yellow"
-            />
-            <button
-              onClick={() => applyHighlight('green')}
-              className="w-6 h-6 bg-green-200 dark:bg-green-500 rounded"
-              title="Highlight Green"
-            />
-            <button
-              onClick={() => applyHighlight('pink')}
-              className="w-6 h-6 bg-pink-200 dark:bg-pink-500 rounded"
-              title="Highlight Pink"
-            />
-            <button
-              onClick={() => applyHighlight('blue')}
-              className="w-6 h-6 bg-blue-200 dark:bg-blue-500 rounded"
-              title="Highlight Blue"
-            />
+          <div className="flex flex-wrap gap-2 mb-2">
+            {Object.keys(lightHighlightColors).map((color) => (
+              <button
+                key={color}
+                className={`w-8 h-8 rounded-md shadow-sm transition-transform hover:scale-110 ${highlightColor === color ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                style={{ backgroundColor: isDarkMode ? darkHighlightColors[color] : lightHighlightColors[color] }}
+                onClick={() => {
+                  setHighlightColor(color);
+                  applyHighlight(color);
+                }}
+                title={`Highlight ${color}`}
+              />
+            ))}
+          </div>
+          <div className="flex justify-between">
+            {/* <button
+              onClick={() => {
+                setShowHighlightMenu(false);
+                window.getSelection().removeAllRanges();
+                isInteractingWithPicker.current = false;
+              }}
+              className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            >
+              Cancel
+            </button> */}
           </div>
         </div>
       )}
@@ -1198,7 +1258,7 @@ const TestRunnerPage = () => {
                   <div className="mb-4">
                     <h4 className="text-md font-medium mb-2 text-gray-900 dark:text-gray-100">Explanation</h4>
                     {/* {renderExplanation(currentQuestion?.explanation, currentQuestion?._id)} */}
-                    <ExplanationFormatText  explanation={currentQuestion?.explanation}/>
+                    <ExplanationText explanation={currentQuestion?.explanation} />
                   </div>
                   {isQuestionSubmitted && currentQuestion?.explanationMedia?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
