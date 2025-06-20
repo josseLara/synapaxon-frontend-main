@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
 export const formatExplanation = (text) => {
     if (!text) return "No explanation available";
@@ -125,15 +125,15 @@ export const formatExplanation = (text) => {
                     result.push('<ul class="list-disc pl-6 my-2">');
                     inLetterList = true;
                 }
-                const letter = line.substr(0, 2);
-                const content = line.substr(3);
+                const letter = line.substring(0, 2);
+                const content = line.substring(3);
                 result.push(`<li><strong>${letter}</strong> ${boldColonTitles(content)}</li>`);
                 continue;
             }
 
             // Elementos con guion "-" en Key points
             if (inKeyPointsList && /^-\s+/.test(line)) {
-                result.push(`<li>${boldColonTitles(line.substr(2))}</li>`);
+                result.push(`<li>${boldColonTitles(line.substring(2))}</li>`);
                 continue;
             }
 
@@ -178,19 +178,24 @@ export const formatExplanation = (text) => {
             const indent = 'pl-' + (6 + level * 2); // Tailwind padding increment
             const ulClass = `list-disc ${indent} my-2`;
 
-            html.push(`<ul class="${ulClass}">`);
+            html.push(`<div class="${ulClass}">`);
             for (const item of items) {
                 if (item.title && item.text) {
-                    html.push(`<li><strong>${item.title}</strong> ${item.text}</li>`);
+                    html.push(`<div><strong>${item.title}</strong> ${item.text}</div>`);
                 } else if (item.title && item.subitems) {
-                    html.push(`<li><strong>${item.title}</strong>`);
+                    html.push(`<div><strong>${item.title}</strong>`);
                     renderItems(item.subitems, level + 1);
-                    html.push(`</li>`);
+                    html.push(`</div>`);
                 } else if (item.text) {
-                    html.push(`<li>${item.text}</li>`);
+                    const formattedText = item.text
+                        .replace(/&/g, '&amp;')   // escape HTML
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/\n/g, '<br>');  // convert newlines to <br>
+                    html.push(`<div class="whitespace-pre-line">${formattedText}</div>`);
                 }
             }
-            html.push('</ul>');
+            html.push('</div>');
         };
 
         if (Array.isArray(data.items)) {
@@ -202,6 +207,7 @@ export const formatExplanation = (text) => {
 };
 
 function parseMedicalTextToObject(rawText) {
+    const rawText2 = rawText
     const cleanedText = rawText
         .replace(/\r?\n|\t/g, ' ')     // elimina saltos de línea y tabs
         .replace(/\s+/g, ' ')          // colapsa espacios
@@ -267,8 +273,8 @@ function parseMedicalTextToObject(rawText) {
                     };
 
                     // Si tiene contenido con "" (subitems), parsear bullets
-                    if (content.includes('')) {
-                        const bullets = content.split('').map(b => b.trim()).filter(Boolean);
+                    if (content.includes('•')) {
+                        const bullets = content.split('•').map(b => b.trim()).filter(Boolean);
                         for (const bullet of bullets) {
                             currentKEItem.subitems.push({ text: bullet });
                         }
@@ -276,10 +282,10 @@ function parseMedicalTextToObject(rawText) {
                         currentKEItem.text = content;
                     }
                     keyEvidenceItems.push(currentKEItem);
-                } else if (subSec.startsWith('')) {
+                } else if (subSec.startsWith('•')) {
                     // Si es un bullet solitario sin título, añadir a último item
                     if (currentKEItem) {
-                        currentKEItem.subitems.push({ text: subSec.replace('', '').trim() });
+                        currentKEItem.subitems.push({ text: subSec.replace('•', '').trim() });
                     }
                 } else {
                     // Texto sin título ni viñeta, posiblemente continuación, anexar al último item
@@ -315,7 +321,7 @@ function parseMedicalTextToObject(rawText) {
                 const classicPresentationText = classicPresentationMatch ? classicPresentationMatch[1].trim() : '';
 
                 // Parsear classicPresentationText por bullets (pueden no tener "", usar saltos de frase o puntos)
-                const classicBullets = classicPresentationText.split(/(?:|\.)\s*/).map(s => s.trim()).filter(Boolean);
+                const classicBullets = classicPresentationText.split(/(?:•|\.)\s*/).map(s => s.trim()).filter(Boolean);
 
                 incorrects.push({
                     title,
@@ -338,188 +344,24 @@ function parseMedicalTextToObject(rawText) {
             });
         }
     }
-
+    if ((!result.title || result.title === "") && result.items.length === 0) {
+        result.title = 'Here is the Explanation'
+        
+        result.items.push({
+            title: '',
+            text: rawText2
+        });
+    }
     return result;
 }
 
-export const ExplanationFormatText = ({ explanation, storageKey = "highlighted_explanation_default" }) => {
-    const [highlightMenuPos, setHighlightMenuPos] = useState(null);
-    const [selectedText, setSelectedText] = useState("");
-    const [highlights, setHighlights] = useState([]);
-    const containerRef = useRef(null);
-    const isInteracting = useRef(false);
 
-    const lightColors = {
-        yellow: "#fef9c3",
-        green: "#d1fae5",
-        pink: "#fce7f3",
-        blue: "#dbeafe",
-    };
-
-    const darkColors = {
-        yellow: "#b59f3b",
-        green: "#228B22",
-        pink: "#C71585",
-        blue: "#1E90FF",
-    };
-
-    const getColor = (color) =>
-        document.documentElement.classList.contains("dark") ? darkColors[color] : lightColors[color];
-
-    useEffect(() => {
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            try {
-                setHighlights(JSON.parse(saved));
-            } catch {
-                setHighlights([]);
-            }
-        }
-    }, [storageKey]);
-
-    useEffect(() => {
-        localStorage.setItem(storageKey, JSON.stringify(highlights));
-    }, [highlights, storageKey]);
-
-    const handleMouseUp = () => {
-        const selection = window.getSelection();
-        const text = selection?.toString().trim();
-
-        // ⚠️ Cancelar si no hay texto o está colapsado
-        if (
-            !text ||
-            selection.isCollapsed ||
-            !selection.rangeCount ||
-            !containerRef.current?.contains(selection.anchorNode)
-        ) {
-            setHighlightMenuPos(null);
-            setSelectedText("");
-            return;
-        }
-
-        // ⚠️ Evitar reaplicar si ya existe highlight igual
-        if (highlights.some(h => h.text === text)) {
-            setHighlightMenuPos(null);
-            setSelectedText("");
-            return;
-        }
-
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        setSelectedText(text);
-        setHighlightMenuPos({
-            x: rect.left + rect.width / 2 + window.scrollX,
-            y: rect.bottom + 10,
-        });
-    };
-
-
-    const applyHighlight = (color) => {
-        if (!selectedText) return;
-        const id = Date.now();
-        setHighlights((prev) => [...prev, { id, text: selectedText, color }]);
-        clearSelection();
-    };
-
-    const removeHighlight = (id) => {
-        setHighlights((prev) => prev.filter((h) => h.id !== Number(id)));
-        clearSelection();
-    };
-
-    const clearSelection = () => {
-        setSelectedText("");
-        setHighlightMenuPos(null);
-        const sel = window.getSelection();
-        if (sel) sel.removeAllRanges();
-    };
-
-    const renderHighlightedHTML = () => {
-        let html = formatExplanation(explanation);
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(`<div>${html}</div>`, "text/html");
-        const container = doc.body.firstChild;
-
-        highlights.forEach(({ id, text, color }) => {
-            const walk = (node) => {
-                if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes(text)) {
-                    const idx = node.nodeValue.indexOf(text);
-                    if (idx === -1) return;
-
-                    const before = node.nodeValue.slice(0, idx);
-                    const match = node.nodeValue.slice(idx, idx + text.length);
-                    const after = node.nodeValue.slice(idx + text.length);
-
-                    const span = document.createElement("span");
-                    span.style.backgroundColor = getColor(color);
-                    span.style.cursor = "pointer";
-                    span.dataset.highlightId = id;
-                    span.textContent = match;
-
-                    const parent = node.parentNode;
-                    parent.replaceChild(document.createTextNode(after), node);
-                    parent.insertBefore(span, parent.lastChild);
-                    if (before) parent.insertBefore(document.createTextNode(before), span);
-                } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    [...node.childNodes].forEach(walk);
-                }
-            };
-            walk(container);
-        });
-
-        return container.innerHTML;
-    };
-
-
-    const handleClick = (e) => {
-        const highlight = e.target.closest("[data-highlight-id]");
-        if (highlight) {
-            removeHighlight(highlight.dataset.highlightId);
-        }
-    };
-
-    useEffect(() => {
-        const cancelIfEmpty = () => {
-            const sel = window.getSelection();
-            if (!sel || sel.isCollapsed) {
-                setHighlightMenuPos(null);
-                setSelectedText("");
-            }
-        };
-        document.addEventListener("selectionchange", cancelIfEmpty);
-        return () => document.removeEventListener("selectionchange", cancelIfEmpty);
-    }, []);
-
+export const ExplanationFormatText = ({ explanation }) => {
+    const html = formatExplanation(explanation);
     return (
-        <div className="relative">
-            {highlightMenuPos && (
-                <div
-                    className="fixed z-50 bg-white dark:bg-gray-800 shadow-md rounded p-2 flex gap-2"
-                    style={{
-                        top: `${highlightMenuPos.y}px`,
-                        left: `${highlightMenuPos.x}px`,
-                        transform: "translateX(-50%)",
-                    }}
-                    onMouseEnter={() => (isInteracting.current = true)}
-                    onMouseLeave={() => (isInteracting.current = false)}
-                >
-                    {Object.keys(lightColors).map((color) => (
-                        <button
-                            key={color}
-                            onClick={() => applyHighlight(color)}
-                            className="w-6 h-6 rounded border border-gray-500"
-                            style={{ backgroundColor: getColor(color) }}
-                        />
-                    ))}
-                </div>
-            )}
-
-            <div
-                ref={containerRef}
-                onMouseUp={handleMouseUp}
-                onClick={handleClick}
-                className="explanation-text-container text-base text-gray-900 dark:text-gray-300"
-                dangerouslySetInnerHTML={{ __html: renderHighlightedHTML() }}
-            />
-        </div>
+        <div
+            className="text-base text-gray-900 dark:text-gray-300"
+            dangerouslySetInnerHTML={{ __html: html }}
+        />
     );
 };
