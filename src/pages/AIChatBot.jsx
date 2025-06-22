@@ -1,85 +1,120 @@
+// AIChatBot.js
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, X, MessageCircle } from 'lucide-react';
-// Assuming '../api/aiapi' exists and handles API calls
-import { sendChatMessageToAI } from '../api/aiapi';
-import ReactMarkdown from 'react-markdown'; // Import ReactMarkdown
-import remarkGfm from 'remark-gfm'; // Import remarkGfm for GitHub Flavored Markdown
+import { Send, X, MessageCircle, Paperclip, Loader } from 'lucide-react'; // Added Paperclip, Loader
+import { sendChatMessageToAI } from '../api/aiapi'; // Corrected import
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
+import { v4 as uuidv4 } from 'uuid'; // For generating thread_id
 
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentThreadId, setCurrentThreadId] = useState(null); // NEW: Store thread_id
+  const [currentThreadId, setCurrentThreadId] = useState(null);
+  const [stagedFiles, setStagedFiles] = useState([]); // NEW: For files to be sent
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null); // NEW: Ref for file input
 
-  // Scroll to the bottom of the chat when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]); // Scroll whenever messages array updates
+  }, [messages]);
 
-  // Toggle chat window visibility
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    // Optionally, you could clear currentThreadId here if you want every "new" chat window open to be a new thread
-    // or persist it in localStorage to continue previous conversations.
-    // For simplicity, let's allow continuing if thread_id exists.
-    // If you want a fresh thread each time the empty chat opens:
-    // if (!isOpen) setCurrentThreadId(null);
+    if (!isOpen && !currentThreadId) { // If opening for the first time in a session
+      const newThreadId = uuidv4();
+      setCurrentThreadId(newThreadId);
+      // Optional: Persist thread_id for next session if desired
+      // localStorage.setItem('aiChatThreadId', newThreadId);
+      setMessages([{ type: 'ai', content: 'Hello! I am Synapax, your AI Medical Tutor. How can I assist you today?' }]);
+    } else if (isOpen && messages.length === 0 && currentThreadId) { // Re-opening an existing session with no messages yet
+        setMessages([{ type: 'ai', content: 'Welcome back! How can I help?' }]);
+    }
   };
 
-  // Initialize chat with a welcome message when opened and messages are empty
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([{ type: 'ai', content: 'Hello! I am Synapax, your AI Medical Tutor. How can I assist you today?' }]);
+  // Removed useEffect for welcome message, handled in toggleChat or initial state
+  // useEffect(() => {
+  //   if (isOpen && messages.length === 0) { ... }
+  // }, [isOpen, messages.length]);
+
+
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const newFiles = files.filter(file => !stagedFiles.some(sf => sf.name === file.name)); // Avoid duplicates
+    setStagedFiles(prev => [...prev, ...newFiles]);
+
+    newFiles.forEach(file => {
+        setMessages(prev => [...prev, { type: 'system', content: `File ready: ${file.name}. Add a message or send.`}]);
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Reset file input to allow selecting same file again
     }
-  }, [isOpen, messages.length]); // Dependencies ensure this runs when chat opens and messages are empty
+  };
+
+  const removeStagedFile = (fileName) => {
+    setStagedFiles(prev => prev.filter(f => f.name !== fileName));
+    setMessages(prev => [...prev, { type: 'system', content: `Removed file: ${fileName}.`}]);
+  };
 
   const sendMessage = async () => {
-    if (input.trim() === '' || isLoading) return;
+    const textInput = input.trim();
+    if ((!textInput && stagedFiles.length === 0) || isLoading) return;
 
-    const userMessage = { type: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]); // Add user message instantly
+    // Ensure threadId is set
+    let effectiveThreadId = currentThreadId;
+    if (!effectiveThreadId) {
+      effectiveThreadId = uuidv4();
+      setCurrentThreadId(effectiveThreadId);
+      // localStorage.setItem('aiChatThreadId', effectiveThreadId);
+      if (messages.length === 0) { // If it's truly the first interaction
+         setMessages([{ type: 'ai', content: 'Hello! I am Synapax, your AI Medical Tutor. How can I assist you today?' }]);
+      }
+    }
 
-    const currentInput = input; // Capture current input before clearing
-    setInput(''); // Clear input field
-    setIsLoading(true); // Show loading indicator
+    // Add user's text message to chat immediately if it exists
+    if (textInput) {
+        const userTextMessage = { type: 'user', content: textInput };
+        setMessages((prev) => [...prev, userTextMessage]);
+    }
+    // Add system messages for files being sent
+    stagedFiles.forEach(file => {
+        setMessages(prev => [...prev, { type: 'system', content: `Sending file: ${file.name}...`}]);
+    });
+
+    const currentInputForAI = textInput;
+    const filesToSend = [...stagedFiles];
+
+    setInput('');
+    setStagedFiles([]); // Clear staged files after preparing to send
+    setIsLoading(true);
 
     try {
-      // History for display is in `messages`. The agent uses checkpointer.
-      // We don't strictly need to send `history` in payload if checkpointer handles it all.
-      // However, sending recent history can be useful for the LLM's immediate context or if
-      // the checkpointer mechanism has some latency or is only for longer-term persistence.
-      // The `create_react_agent` primarily relies on the checkpointer.
-      const historyForPayload = messages
-        .filter(msg => msg.type === 'user' || msg.type === 'ai')
-        .slice(0, -1) // Exclude the user message just added locally
-        .slice(-6); // Send last 3 pairs of user/AI messages for context, adjust as needed
-
+      // History is handled by the agent's checkpointer via thread_id,
+      // so we don't need to send `history` in the payload from here.
       const response = await sendChatMessageToAI({
-        message: currentInput,
-        history: historyForPayload, // Optional: for immediate context if desired by agent prompt
-        thread_id: currentThreadId, // Send current thread_id
+        message: currentInputForAI,
+        thread_id: effectiveThreadId,
+        files: filesToSend,
       });
 
       if (response.success && response.response) {
         const aiMessage = { type: 'ai', content: response.response };
-        setMessages((prev) => [...prev, aiMessage]); // Add AI response
+        setMessages((prev) => [...prev, aiMessage]);
         if (response.thread_id && response.thread_id !== currentThreadId) {
-          setCurrentThreadId(response.thread_id); // Update if backend assigned a new one
-          // Optional: Persist thread_id for next session if desired
+          setCurrentThreadId(response.thread_id);
           // localStorage.setItem('aiChatThreadId', response.thread_id);
         }
       } else {
-        const errorMessageContent = response.message || 'Sorry, I had trouble understanding that.';
+        const errorMessageContent = response.message || 'Sorry, I had trouble processing that.';
         setMessages((prev) => [...prev, { type: 'ai', content: errorMessageContent }]);
       }
     } catch (error) {
       console.error('Error in sendMessage component:', error);
-      setMessages((prev) => [...prev, { type: 'ai', content: 'Network error. Please try again.' }]);
+      setMessages((prev) => [...prev, { type: 'ai', content: 'Network error or unexpected issue. Please try again.' }]);
     } finally {
-      setIsLoading(false); // Hide loading indicator
+      setIsLoading(false);
     }
   };
 
@@ -238,6 +273,31 @@ const AIChatBot = () => {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Staged Files Display */}
+            {stagedFiles.length > 0 && (
+              <div className="px-3 pt-2 pb-1 border-t dark:border-gray-700 text-xs space-y-1">
+                <p className="text-gray-600 dark:text-gray-400 font-medium">Files to send:</p>
+                {stagedFiles.map((file, index) => (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-1.5 rounded text-gray-700 dark:text-gray-200"
+                  >
+                    <span className="truncate max-w-[80%]">{file.name}</span>
+                    <button 
+                      onClick={() => removeStagedFile(file.name)} 
+                      className="text-red-500 hover:text-red-700 ml-1 p-0.5"
+                      aria-label={`Remove ${file.name}`}
+                    >
+                      <X size={14} />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
           {/* 👇 Input always pinned at bottom */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -246,6 +306,26 @@ const AIChatBot = () => {
             className="p-4 border-t dark:border-gray-700"
           >
             <div className="flex items-center gap-2">
+              {/* File Upload Button */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  multiple
+                  className="hidden"
+                  id="chatBotFileInput"
+                  accept="image/*,.pdf,.doc,.docx,.txt" // Specify acceptable file types
+                />
+                <motion.label
+                  htmlFor="chatBotFileInput"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 cursor-pointer border border-gray-300 dark:border-gray-500 rounded-md flex items-center justify-center h-[42px] w-[42px]" // Fixed size
+                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.05)'}}
+                  whileTap={{ scale: 0.95 }}
+                  title="Attach files"
+                >
+                  <Paperclip size={20} />
+                </motion.label>
+
               <motion.input
                 type="text"
                 value={input}

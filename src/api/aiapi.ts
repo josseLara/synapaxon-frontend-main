@@ -5,7 +5,7 @@ import axios from 'axios';
 // In development, this might be http://localhost:8000
 // In production, this will be the URL where your FastAPI AI service is deployed.
 // It's good practice to use environment variables for this.
-const AI_BACKEND_URL = 'https://oral-ivy-ujjwal0704-4b62219b.koyeb.app/';
+const AI_BACKEND_URL = 'https://oral-ivy-ujjwal0704-4b62219b.koyeb.app';
 
 const aiApiClient = axios.create({
   baseURL: AI_BACKEND_URL,
@@ -174,48 +174,69 @@ export const explainAnswerChoiceAI = async (
 };
 
 
-// --- Interfaces for AI Chat ---
-interface AIChatMessage { // Matches Pydantic ChatMessage
-  type: 'user' | 'ai';
-  content: string;
-}
-
-interface AIChatRequestPayload {
+interface AIChatRequestPayloadFormData { // For clarity, though not strictly a type for FormData
   message: string;
-  history?: AIChatMessage[]; // Keep for potential display or initial priming if desired
-  thread_id?: string | null; // Send current thread_id, or null/undefined for new chat
+  thread_id?: string | null;
+  files?: File[]; // Files will be appended to FormData
 }
 
 interface AIChatResponse { // Matches FastAPI response model
   response: string;
-  thread_id: string; // Backend will always return a thread_id
-  success?: boolean; // Add this for consistent handling in the component
-  message?: string; // For errors
+  thread_id: string;
+  success?: boolean; // Added by frontend wrapper for consistent handling
+  message?: string;  // For errors, added by frontend wrapper
 }
 
+// Updated function to handle FormData for file uploads
 export const sendChatMessageToAI = async (
-  payload: AIChatRequestPayload
+  payload: AIChatRequestPayloadFormData // Expects an object with message, thread_id, and optional files
 ): Promise<AIChatResponse> => {
+  const formData = new FormData();
+  formData.append('message', payload.message);
+
+  if (payload.thread_id) {
+    formData.append('thread_id', payload.thread_id);
+  }
+  // History is not sent in payload as agent uses checkpointer via thread_id
+
+  if (payload.files && payload.files.length > 0) {
+    payload.files.forEach((file) => {
+      formData.append('files', file); // Key 'files' must match FastAPI param
+    });
+  }
+
   try {
-    const backendResponse = await aiApiClient.post<AIChatResponse>( // Expect AIChatResponse directly
+    const backendResponse = await aiApiClient.post<AIChatResponse>( // Expecting AIChatResponse structure from backend
       '/api/ai-chat',
-      payload
+      formData, // Send as FormData
+      {
+        headers: {
+          // Axios automatically sets 'Content-Type': 'multipart/form-data' for FormData
+        },
+      }
     );
 
-    // The backend now directly returns the structure we need, plus success
+    // Backend now directly returns the structure we need (response, thread_id)
+    // We add 'success: true' for consistent handling in the component.
     return { ...backendResponse.data, success: true };
 
   } catch (error) {
     console.error('Error sending chat message to AI:', error);
     const defaultErrorMsg = 'An unexpected error occurred with the AI chat service.';
     let errorMessage = defaultErrorMsg;
+    let responseThreadId = payload.thread_id || ''; // Fallback thread_id
+
     if (axios.isAxiosError(error) && error.response && error.response.data) {
       errorMessage = error.response.data.detail || error.response.data.message || defaultErrorMsg;
+      // If backend error response includes thread_id, use it
+      if (error.response.data.thread_id) {
+        responseThreadId = error.response.data.thread_id;
+      }
     }
     return {
       success: false,
-      response: '', // No valid response on error
-      thread_id: payload.thread_id || '', // Return original thread_id or empty if none
+      response: '',
+      thread_id: responseThreadId,
       message: errorMessage,
     };
   }
