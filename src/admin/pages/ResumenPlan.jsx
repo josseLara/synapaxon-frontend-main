@@ -165,7 +165,7 @@ const ResumenPlan = () => {
   };
 
   const pieChartOptions = {
-    responsive: true,
+    // responsive: true,
     plugins: {
       legend: {
         position: 'top'
