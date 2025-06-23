@@ -250,7 +250,7 @@ const ResumenPlan = () => {
           <Bar data={barChartData} options={barChartOptions} height={300} />
         </div>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <div style={{ width: '80%', margin: '0 auto' }}>
+          <div style={{ width: '80%', margin: '0 auto',minHeight: '390px' }}>
             <Pie data={pieChartData} options={pieChartOptions} height={300} />
           </div>
         </div>
