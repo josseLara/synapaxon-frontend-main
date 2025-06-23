@@ -22,6 +22,7 @@ import Questions from './admin/pages/Questions';
 import Settings from './admin/pages/Settings';
 import Users from './admin/pages/Users';
 import Preloader from './components/Preloader';
+import ResumenPlan from '../../src/admin/pages/ResumenPlan';
 
 function App() {
 
@@ -61,6 +62,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="content" element={<Content />} />
           <Route path="questions" element={<Questions />} />
+          <Route path="resumen-plan" element={<ResumenPlan />} />
           <Route path="settings" element={<Settings />} />
           <Route path="users" element={<Users />} />
         </Route>

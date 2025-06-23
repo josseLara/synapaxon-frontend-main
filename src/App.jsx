@@ -23,6 +23,7 @@ import QuestionBank from './admin/pages/QuestionBank';
 import AIQuestionAssistant from './pages/AIQuestionAssistant';
 import Subscribers from './admin/pages/Subscribers';
 import RouteChangeLoader from "./components/RouteChangeLoader";
+import ResumenPlan from './admin/pages/ResumenPlan';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
             <Route path="analytics" element={<AnalyticsDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="questions" element={<QuestionBank />} /> 
+            <Route path="resumen-plan" element={<ResumenPlan />} /> 
             <Route path="subscribers" element={<Subscribers />} />
           </Route>
 
