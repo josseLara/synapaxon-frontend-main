@@ -11,27 +11,28 @@ import axios from '../../api/axiosConfig'
 import { useStripe } from "../../hook/useStripe"
 import { toast } from 'react-toastify' // Optional for notifications
 
+
 const subscriptionsData = [
   {
     id: 'free',
     name: "Free",
     description: "Ideal for students just starting out",
     price: 0,
-    features: ["Basic access", "Email support"]
+    features: ["Upload up to 5 questions per day", "Use AI chat up to 5 times per day","Use agent up to 5 times per day"]
   },
   {
     id: 'pro',
     name: "Pro",
     description: "For serious students who need more resources",
     price: 9.00,
-    features: ["Priority access", "24/7 support", "Advanced statistics"]
+    features: ["Upload up to 50 questions per day", "Use AI chat up to 50 times per day", "Use agent up to 20 times per day"]
   },
   {
     id: 'premium',
     name: "Premium",
     description: "For professionals who need maximum performance",
     price: 29.00,
-    features: ["Unlimited access", "Priority support", "Complete analytics"]
+    features: ["Upload up to 100 questions per day", "Use AI chat up to 100 times per day", "Use agent up to 50 times per day"]
   }
 ]
 
