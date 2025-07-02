@@ -24,6 +24,7 @@ import AIQuestionAssistant from './pages/AIQuestionAssistant';
 import Subscribers from './admin/pages/Subscribers';
 import RouteChangeLoader from "./components/RouteChangeLoader";
 import ResumenPlan from './admin/pages/ResumenPlan';
+import SubscriptionPage from './admin/pages/SubscriptionPage';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="attempted-questions" element={<AttemptedQuestionsPage />} />
             <Route path="test-detail/:testId" element={<ProtectedRoute requiredRole="student"><TestDetailPage /></ProtectedRoute>} />
             <Route path="create/AIQuestionAssistant" element={<ProtectedRoute requiredRole="student"><AIQuestionAssistant /></ProtectedRoute>} />
+            <Route path="subscription" element={<SubscriptionPage />} />
           </Route>
           <Route path="/dashboard/test-runner" element={<ProtectedRoute requiredRole="student"><TestRunnerPage /></ProtectedRoute>} />
 

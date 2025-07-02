@@ -37,7 +37,7 @@ export default function Header({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
     const localStorageName = typeof window !== "undefined" ? localStorage.getItem("username") : null
-    
+
     // Check if window is scrolled
     useEffect(() => {
         const handleScroll = () => {
@@ -75,8 +75,8 @@ export default function Header({
     return (
         <header
             className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled
-                    ? "bg-blue-900/95 dark:bg-blue-950/95 backdrop-blur-md shadow-lg"
-                    : "bg-blue-900 dark:bg-blue-950"
+                ? "bg-blue-900/95 dark:bg-blue-950/95 backdrop-blur-md shadow-lg"
+                : "bg-blue-900 dark:bg-blue-950"
                 }`}
         >
             <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,6 +131,12 @@ export default function Header({
                             isActive={activeComponent === "attempted-questions"}
                             onClick={() => handleNavClick("attempted-questions", "/dashboard/attempted-questions")}
                         />
+                        <NavButton
+                            icon={<CheckCircle size={18} />}
+                            label="Subscription"
+                            isActive={activeComponent === "subscription"}
+                            onClick={() => handleNavClick("subscription", "/dashboard/subscription")}
+                        />
                     </nav>
 
                     {/* Right side items */}
@@ -180,7 +186,7 @@ export default function Header({
                                                 {currentUser?.email || "usuario@ejemplo.com"}
                                             </p>
                                         </div>
-                                       
+
                                         <div className="py-1 border-t border-gray-200 dark:border-gray-700">
                                             <MenuItem icon={<LogOut size={16} />} label="Log out" onClick={logout} danger />
                                         </div>
@@ -279,8 +285,8 @@ function NavButton({ icon, label, isActive, onClick }) {
         <Button
             onClick={onClick}
             className={`flex items-center gap-2 ${isActive
-                    ? "bg-white text-blue-900 dark:bg-blue-100 dark:text-blue-900 font-medium shadow-md"
-                    : "bg-blue-700 hover:bg-blue-600 text-white"
+                ? "bg-white text-blue-900 dark:bg-blue-100 dark:text-blue-900 font-medium shadow-md"
+                : "bg-blue-700 hover:bg-blue-600 text-white"
                 }`}
         >
             {icon}
@@ -295,8 +301,8 @@ function MobileNavButton({ icon, label, isActive, onClick }) {
         <Button
             onClick={onClick}
             className={`flex items-center gap-3 w-full justify-start ${isActive
-                    ? "bg-white text-blue-900 dark:bg-blue-100 dark:text-blue-900 font-medium shadow-md"
-                    : "bg-blue-700 hover:bg-blue-600 text-white"
+                ? "bg-white text-blue-900 dark:bg-blue-100 dark:text-blue-900 font-medium shadow-md"
+                : "bg-blue-700 hover:bg-blue-600 text-white"
                 }`}
         >
             {icon}
