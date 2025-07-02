@@ -23,14 +23,14 @@ const subscriptionsData = [
     id: 'pro',
     name: "Pro",
     description: "For serious students who need more resources",
-    price: 9.99,
+    price: 9.00,
     features: ["Priority access", "24/7 support", "Advanced statistics"]
   },
   {
     id: 'premium',
     name: "Premium",
     description: "For professionals who need maximum performance",
-    price: 19.99,
+    price: 29.00,
     features: ["Unlimited access", "Priority support", "Complete analytics"]
   }
 ]
