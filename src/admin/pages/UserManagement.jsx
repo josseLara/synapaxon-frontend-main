@@ -31,7 +31,7 @@ const UserManagement = () => {
       setLoading(true);
       const response = await axios.get('/api/auth/users');
       const sortedUsers = response.data.data
-        .map(user => ({
+        ?.map(user => ({
           ...user,
           id: user._id // Map _id to id
         }))
@@ -54,24 +54,27 @@ const UserManagement = () => {
   };
 
   const filterUsers = () => {
-    let filtered = [...users];
+    if (users) {
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+      let filtered = [...users];
 
-    if (filters.plan !== 'all') {
-      filtered = filtered.filter((user) => user.plan === filters.plan);
-    }
-    if (filters.role !== 'all') {
-      filtered = filtered.filter((user) => user.role === filters.role);
-    }
+      if (searchTerm) {
+        filtered = filtered.filter(
+          (user) =>
+            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
 
-    setFilteredUsers(filtered);
+      if (filters.plan !== 'all') {
+        filtered = filtered.filter((user) => user.plan === filters.plan);
+      }
+      if (filters.role !== 'all') {
+        filtered = filtered.filter((user) => user.role === filters.role);
+      }
+
+      setFilteredUsers(filtered);
+    }
   };
 
   const handleAction = async (action, user) => {
@@ -286,7 +289,7 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredUsers.map((user) => (
+              {filteredUsers?.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -306,11 +309,10 @@ const UserManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'admin'
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin'
                           ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100'
                           : 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-                      }`}
+                        }`}
                     >
                       {user.role}
                     </span>
@@ -320,13 +322,12 @@ const UserManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.plan === 'premium'
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.plan === 'premium'
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
                           : user.plan === 'pro'
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        }`}
                     >
                       {user.plan}
                     </span>
@@ -385,7 +386,7 @@ const UserManagement = () => {
                   className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 sm:text-sm"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Plan

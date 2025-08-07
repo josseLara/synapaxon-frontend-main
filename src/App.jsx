@@ -25,6 +25,7 @@ import Subscribers from './admin/pages/Subscribers';
 import RouteChangeLoader from "./components/RouteChangeLoader";
 import ResumenPlan from './admin/pages/ResumenPlan';
 import SubscriptionPage from './admin/pages/SubscriptionPage';
+import TermsPage from './pages/Terms';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/terms" element={<TermsPage />} />
           <Route path="/auth/callback" element={<GoogleAuthCallback />} />
 
           {/* Student Dashboard Routes */}

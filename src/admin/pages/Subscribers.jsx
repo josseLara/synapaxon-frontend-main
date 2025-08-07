@@ -20,7 +20,7 @@ function Subscribers() {
       setLoading(true);
       const response = await axios.get('/api/auth/users');
       const sortedUsers = response.data.data
-        .map(user => ({
+        ?.map(user => ({
           ...user,
           id: user._id
         }))
@@ -67,27 +67,31 @@ function Subscribers() {
   }, [users, searchTerm, filters]);
 
   const filterUsers = () => {
-    let filtered = [...users];
+    if (users) {
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      let filtered = [...users];
+
+      if (searchTerm) {
+        filtered = filtered.filter(
+          (user) =>
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      if (filters.plan !== 'all') {
+        filtered = filtered.filter((user) => user.plan === filters.plan);
+      }
+
+      setFilteredUsers(filtered);
     }
-
-    if (filters.plan !== 'all') {
-      filtered = filtered.filter((user) => user.plan === filters.plan);
-    }
-
-    setFilteredUsers(filtered);
   };
 
   const handleUserAction = async (action, userId) => {
     try {
       setLoading(true);
       let newPlan;
+
       if (action === 'upgrade' || action === 'downgrade') {
         const currentPlan = userDetails.plan;
         if (action === 'upgrade') {
@@ -105,23 +109,32 @@ function Subscribers() {
             return;
           }
         }
+
         await axios.put(`/api/auth/users/${userId}`, {
           plan: newPlan,
-          role: userDetails.role
+          role: userDetails.role,
+          isActive:true
         });
         setMessage({ type: 'success', text: `User ${action}d to ${newPlan} successfully` });
+
       } else if (action === 'refund') {
-        await axios.post(`/api/auth/users/${userId}/refund`);
+        await axios.post(`/api/users/${userId}/refund`);
         setMessage({ type: 'success', text: 'Refund processed successfully' });
+
       } else if (action === 'revoke') {
-        await axios.put(`/api/auth/users/${userId}/revoke`);
+        await axios.put(`/api/users/${userId}/revoke`);
         setMessage({ type: 'success', text: 'Access revoked successfully' });
       }
+
       await fetchUserDetails(userId);
       await fetchUsers();
       setTimeout(() => setMessage(null), 3000);
+
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to perform action' });
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to perform action'
+      });
       setTimeout(() => setMessage(null), 3000);
     } finally {
       setLoading(false);
@@ -263,7 +276,7 @@ function Subscribers() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredUsers.map((user) => (
+              {filteredUsers?.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -286,13 +299,12 @@ function Subscribers() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.plan === 'premium'
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                          : user.plan === 'pro'
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.plan === 'premium'
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                        : user.plan === 'pro'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}
+                        }`}
                     >
                       {user.plan}
                     </span>
@@ -363,13 +375,12 @@ function Subscribers() {
               <div className="space-y-2">
                 <p className="text-gray-900 dark:text-gray-100">
                   <span className="font-medium">Current Plan:</span>{' '}
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    userDetails.plan === 'premium'
-                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                      : userDetails.plan === 'pro'
+                  <span className={`px-2 py-1 rounded-full text-sm ${userDetails.plan === 'premium'
+                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                    : userDetails.plan === 'pro'
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
                       : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                  }`}>
+                    }`}>
                     {userDetails.plan}
                   </span>
                 </p>
